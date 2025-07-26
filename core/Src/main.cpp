@@ -101,7 +101,7 @@ extern "C" void app_main(void)
 */
 
 // Reading I2C devices example
-
+/*
 #include "esp_log.h"
 #include "main.h"
 
@@ -229,4 +229,12 @@ extern "C" void app_main(void)
     }
 
     vTaskDelete(NULL);
+}
+*/
+
+#include "main.h"
+
+extern "C" void app_main(void)
+{
+    ;
 }

@@ -20,6 +20,8 @@ public:
 };
 */
 
+// I2C Communication Tutorial
+/*
 #include "stdio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -51,3 +53,6 @@ public:
 
 #define BMP_TEMP_DATA 0xFA
 #define BMP_PRESS_DATA 0xF7
+*/
+
+#include "I2C.h"

@@ -55,4 +55,5 @@ public:
 #define BMP_PRESS_DATA 0xF7
 */
 
-#include "I2C.h"
+#include "stdio.h"
+#include "BMP280.h"

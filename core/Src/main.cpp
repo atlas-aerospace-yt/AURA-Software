@@ -230,11 +230,24 @@ extern "C" void app_main(void)
 
     vTaskDelete(NULL);
 }
-*/
 
+*/
 #include "main.h"
 
 extern "C" void app_main(void)
 {
-    ;
+
+    i2c::i2c_bus my_bus(GPIO_NUM_8, GPIO_NUM_9);
+    bmp280::bmp280 my_bmp(&my_bus);
+    float data=0;
+
+    while (true)
+    {
+        my_bmp.update();
+        data = my_bmp.get_pressure();
+
+        printf("Recorded temperature: %fkPa\n", data);
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }

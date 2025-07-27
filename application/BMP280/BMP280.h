@@ -61,29 +61,9 @@ namespace bmp280
 
         float _initial_pressure=0;
 
-        void _calibrate(void)
-        {
-            _dig_t1 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_T1);
-            _dig_t2 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_T2);
-            _dig_t3 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_T3);
-            _dig_p1 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P1);
-            _dig_p2 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P2);
-            _dig_p3 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P3);
-            _dig_p4 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P4);
-            _dig_p5 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P5);
-            _dig_p6 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P6);
-            _dig_p7 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P7);
-            _dig_p8 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P8);
-            _dig_p9 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P9);
-        }
-
-        void _get_compensated_temp(void)
-        {
-            uint32_t var1, var2;
-            var1 = ((((_raw_temp >> 3) - ((int32_t)_dig_t1 << 1))) * ((int32_t)_dig_t2)) >> 11;
-            var2 = (((((_raw_temp >> 4) - ((int32_t)_dig_t1)) * ((_raw_temp >> 4) - ((int32_t)_dig_t1))) >> 12) * ((int32_t)_dig_t3)) >> 14;
-            _comp_temp = var1 + var2;
-        }
+        void _set_mode(void);
+        void _calibrate(void);
+        void _get_compensated_temp(void);
 
     public:
         bmp280(i2c::i2c_bus* master_bus, uint8_t addr=BMP_ADDR)
@@ -98,22 +78,16 @@ namespace bmp280
                 &_bmp_handle
             ));
 
-            uint8_t ctrl_meas_init = ((uint8_t) TEMP_OVERSAMPLE << 5);
-            ctrl_meas_init |= ((uint8_t) PRESS_OVERSAMPLE << 2);
-            ctrl_meas_init |= ((uint8_t) NORMAL_MODE);
-
-            ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_bmp_handle,
-                BMP_CTRL_MEAS,
-                ctrl_meas_init
-            ));
-
+            _set_mode();
             _calibrate();
+            update();
+            _initial_pressure = get_pressure();
         }
 
         void set_height(float acc_height);
         void update(void);
         float get_pressure(void);
         float get_temperature(void);
-        float get_alt(void);
+        float get_altitude(void);
     };
 };

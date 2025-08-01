@@ -12,7 +12,7 @@
 #define DEFAULT_PRIORITY 0
 #define GLITCH_IGNORE_COUNT 7
 
-#define BYTE_LEN 8
+#define BYTE_MASK 0xff
 
 namespace i2c
 {
@@ -107,6 +107,29 @@ namespace i2c
             }
 
             return output;
+        }
+
+        template<typename T, size_t N>
+        void write_bytes_i2c(
+            i2c_master_dev_handle_t dev_handle,
+            uint8_t reg_addr,
+            T data
+        )
+        {
+            uint8_t write_buf[N+1];
+            write_buf[0] = reg_addr;
+
+            for (int i=1; i <= N; i++)
+            {
+                write_buf[i] = static_cast<uint8_t>((data >> ((N-i)*8)) & BYTE_MASK);
+            }
+
+            ESP_ERROR_CHECK(i2c_master_transmit(
+                dev_handle,
+                write_buf,
+                sizeof(write_buf),
+                pdMS_TO_TICKS(I2C_MASTER_TIMEOUT_MS)
+            ));
         }
     };
 };

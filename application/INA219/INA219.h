@@ -14,9 +14,10 @@
 #define I2C_SPEED 100000
 
 #define CALIB_VALUE 0xD1B8
+
 #define LSB_BUS_V 2048.0f
-#define LSB_CURRENT
-#define LSB_POWER
+#define LSB_CURRENT 327.68f
+#define LSB_POWER 16.384
 
 namespace ina219
 {    
@@ -42,6 +43,8 @@ namespace ina219
                 &_ina_config,
                 &_ina_handle
             ));
+
+            _calibrate();
         }
 
         float get_power(void);

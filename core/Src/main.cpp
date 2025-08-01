@@ -14,7 +14,8 @@ extern "C" void app_main(void)
     while (true)
     {
         printf("Voltage: %f\n", my_ina.get_voltage());
-        my_ina.get_current(); // TODO stop outputting 0 by calibrating
+        printf("Current: %f\n", my_ina.get_current());
+        printf("Power: %f\n\n", my_ina.get_power());
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }

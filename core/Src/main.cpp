@@ -14,8 +14,13 @@ extern "C" void app_main(void)
     while (true)
     {
 
-        my_icm.get_mag();
+        my_icm.update();
+        my_icm.update_mag();
 
-        vTaskDelay(pdMS_TO_TICKS(500));
+        printf("Gyro: %f %f %f\n", my_icm.gyro_x, my_icm.gyro_y, my_icm.gyro_z);
+        printf("Accel: %f %f %f\n", my_icm.acc_x, my_icm.acc_y, my_icm.acc_z);
+        printf("Mag: %f %f %f\n\n", my_icm.mag_x, my_icm.mag_y, my_icm.mag_z);
+
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

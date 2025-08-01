@@ -88,9 +88,11 @@
 #define AXIS_MASK 0xffff
 
 /* Conversion definitions */
-#define CONVERT_ACCEL 1
-#define CONVERT_GYRO 1
+#define CONVERT_ACCEL 208.767f
+#define CONVERT_GYRO 938.74f
 #define CONVERT_MAG 0.15f
+
+#define MAG_Z_OFFS 45.0f
 
 namespace icm20948
 {
@@ -115,6 +117,9 @@ namespace icm20948
         void _configure_mag(void);
 
     public:
+        float gyro_x, gyro_y, gyro_z, acc_x, acc_y, acc_z;
+        float mag_x, mag_y, mag_z;
+
         icm20948(i2c::i2c_bus* master_bus)
             : _master_bus(master_bus)
         {
@@ -145,7 +150,7 @@ namespace icm20948
         }
 
         void update(void);
-        void get_mag(void);
+        void update_mag(void);
 
     };
 };

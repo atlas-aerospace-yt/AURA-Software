@@ -12,5 +12,6 @@
     "--background-index",
     "--query-driver=C:\\Users\\Alexander_Armitage\\.espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
     "--compile-commands-dir=c:\\Users\\Alexander_Armitage\\Documents\\GitHub\\AURA-Software\\build"
-  ]
+  ],
+  "C_Cpp.errorSquiggles": "disabled"
 }

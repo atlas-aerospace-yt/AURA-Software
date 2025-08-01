@@ -1,9 +1,15 @@
 /**
  * 
+ * ICM20948 datasheet -
+ * https://invensense.tdk.com/wp-content/uploads/2016/06/DS-000189-ICM-20948-v1.3.pdf
+ * 
+ * AK09916 datasheet - 
+ * https://www.y-ic.es/datasheet/78/SMDSW.020-2OZ.pdf
  * 
  */
- #pragma once
+#pragma once
 
+#include "math.h"
 #include "I2C.h"
 
 #define ICM_ADDR 0x68
@@ -49,7 +55,19 @@
 
 /* AK09916 Magnetometer definitions*/
 #define MAG_ADDR 0x0C
-#define MAG 1
+
+#define MAG_ST1 0x10
+#define MAG_ST2 0x18
+
+#define MAG_CNTRL_2 0x31
+#define MAG_CNTRL_3 0x32
+
+#define MAG_HXL 0x11
+#define MAG_HXH 0x12
+#define MAG_HYL 0x13
+#define MAG_HTH 0x14
+#define MAG_HZL 0x15
+#define MAG_HZH 0x16
 
 /* Initial settings values */
 #define ON_MODE 0x00
@@ -64,7 +82,15 @@
 #define ACCEL_CONFIG_2 0x02
 #define ACCEL_SMPLRT_DIV 0x00
 
+#define MAG_SLEEP 0x0
+#define MAG_CONT_MODE_4 0x08
+
 #define AXIS_MASK 0xffff
+
+/* Conversion definitions */
+#define CONVERT_ACCEL 1
+#define CONVERT_GYRO 1
+#define CONVERT_MAG 0.15f
 
 namespace icm20948
 {
@@ -73,28 +99,43 @@ namespace icm20948
     private:
         i2c::i2c_bus* _master_bus;
 
+        // ICM20948 I2C handle
         i2c_master_dev_handle_t _icm_handle;
         i2c_device_config_t _icm_config = {};
 
-        const uint8_t _icm_addr;
+        // Internal AK09916 I2C handle
+        i2c_master_dev_handle_t _mag_handle;
+        i2c_device_config_t _mag_config = {};
 
         void _wake_device(void);
         void _select_register(uint8_t reg);
         void _configure_gyro(void);
         void _configure_accel(void);
+        void _set_i2c_bypass(void);
         void _configure_mag(void);
 
     public:
-        icm20948(i2c::i2c_bus* master_bus, uint8_t addr=ICM_ADDR)
-            : _master_bus(master_bus), _icm_addr(addr)
+        icm20948(i2c::i2c_bus* master_bus)
+            : _master_bus(master_bus)
         {
             _icm_config.dev_addr_length = I2C_ADDR_BIT_LEN_7;
             _icm_config.scl_speed_hz = I2C_SPEED;
-            _icm_config.device_address = _icm_addr;
+            _icm_config.device_address = ICM_ADDR;
 
             ESP_ERROR_CHECK(_master_bus->add_slave_to_bus(
                 &_icm_config,
                 &_icm_handle
+            ));
+
+            _set_i2c_bypass();
+
+            _mag_config.dev_addr_length = I2C_ADDR_BIT_LEN_7;
+            _mag_config.scl_speed_hz = I2C_SPEED;
+            _mag_config.device_address = MAG_ADDR;
+
+            ESP_ERROR_CHECK(_master_bus->add_slave_to_bus(
+                &_mag_config,
+                &_mag_handle
             ));
 
             _wake_device();
@@ -104,6 +145,7 @@ namespace icm20948
         }
 
         void update(void);
+        void get_mag(void);
 
     };
 };

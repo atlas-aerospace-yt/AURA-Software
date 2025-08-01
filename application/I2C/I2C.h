@@ -88,7 +88,8 @@ namespace i2c
         template<typename T, size_t N>
         T read_bytes_i2c(
              i2c_master_dev_handle_t dev_handle,
-             uint8_t reg_addr
+             uint8_t reg_addr,
+             bool lil_end=false
         )
         {
             T output = 0;
@@ -103,8 +104,22 @@ namespace i2c
 
             for (int i=0; i<N; i++)
             {
-                output |= ((T)data[i]) << ((N - 1 - i) * 8);
-            }
+                if (!lil_end)
+                {
+                    output |= ((T)data[i]) << ((N - 1 - i) * 8);
+                }
+                else
+                {
+                    if (i % 2 == 0)
+                    {
+                        output |= ((T)data[i + 1]) << ((N - 1 - i) * 8);
+                    }
+                    else
+                    {
+                        output |= ((T)data[i - 1]) << ((N - 1 - i) * 8);
+                    }
+                }
+            }   
 
             return output;
         }

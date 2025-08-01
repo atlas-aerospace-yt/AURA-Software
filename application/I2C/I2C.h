@@ -75,6 +75,8 @@ namespace i2c
             uint8_t data
         );
 
+        esp_err_t master_probe(uint8_t dev_addr);
+
         /**
          * Read n bytes from a register of an i2c device.
          * 

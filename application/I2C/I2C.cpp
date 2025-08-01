@@ -29,3 +29,8 @@ esp_err_t i2c::i2c_bus::write_byte_i2c(
         sizeof(write_buf),
         pdMS_TO_TICKS(I2C_MASTER_TIMEOUT_MS));
 }
+
+esp_err_t i2c::i2c_bus::master_probe(uint8_t dev_addr)
+{
+    return i2c_master_probe(_bus_handle, dev_addr, -1);
+}

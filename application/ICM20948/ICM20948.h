@@ -70,7 +70,8 @@
 #define MAG_HZH 0x16
 
 /* Initial settings values */
-#define ON_MODE 0x00
+#define PWR_MGMT_1 0x01
+#define PWR_MGMT_2 0x00
 #define LP_CONFIG 0x00
 #define INT_PIN_CFG 0x52
 

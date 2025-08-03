@@ -5,12 +5,12 @@ void icm20948::icm20948::_wake_device(void)
     ESP_ERROR_CHECK(_master_bus->write_byte_i2c(
         _icm_handle,
         ICM_PWR_MGMT_1,
-        ON_MODE
+        PWR_MGMT_1
     ));
     ESP_ERROR_CHECK(_master_bus->write_byte_i2c(
         _icm_handle,
         ICM_PWR_MGMT_2,
-        ON_MODE
+        PWR_MGMT_2
     ));
 }
 

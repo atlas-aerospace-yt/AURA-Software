@@ -8,19 +8,54 @@ extern "C" void app_main(void)
     icm20948::icm20948 my_icm(&my_bus);
     //ina219::ina219 my_ina(&my_bus);
 
-    gpio_reset_pin(GPIO_NUM_5);
-    gpio_set_direction(GPIO_NUM_5, GPIO_MODE_OUTPUT);
+    Quat rate;
+    Quat gyro = {0.0f, 0.0f, 0.0f, 0.0f};
+    Quat ori_quat = {1.0f, 0.0f, 0.0f, 0.0f};
+    Vect ori_euler = {0.0f, 0.0f, 0.0f};
+
+    float dt;
+    float x_offs = 0.0f, y_offs = 0.0f, z_offs = 0.0f;
+
+    int64_t delta_us, now;
+    int64_t last_time = esp_timer_get_time();
+
+    for (int i=0; i<1000; i++)
+    {
+        my_icm.update();
+        x_offs += my_icm.gyro_x;
+        y_offs += my_icm.gyro_y;
+        z_offs += my_icm.gyro_z;
+        vTaskDelay(pdMS_TO_TICKS(3));
+    }
+
+    x_offs /= 1000.0f;
+    y_offs /= 1000.0f;
+    z_offs /= 1000.0f;
 
     while (true)
     {
+        now = esp_timer_get_time();
+        delta_us = now - last_time;
+        last_time = now;
+
+        if (delta_us < 0) delta_us = 0;
+        dt = (float)delta_us / 1e6f;
 
         my_icm.update();
-        my_icm.update_mag();
+        gyro.i = my_icm.gyro_x - x_offs;
+        gyro.j = my_icm.gyro_y - y_offs;
+        gyro.k = my_icm.gyro_z - z_offs;
 
-        printf("Gyro: %f %f %f\n", my_icm.gyro_x, my_icm.gyro_y, my_icm.gyro_z);
-        printf("Accel: %f %f %f\n", my_icm.acc_x, my_icm.acc_y, my_icm.acc_z);
-        printf("Mag: %f %f %f\n\n", my_icm.mag_x, my_icm.mag_y, my_icm.mag_z);
 
-        vTaskDelay(pdMS_TO_TICKS(100));
+        rate = ori_quat * 0.5f * gyro;
+        ori_quat = ori_quat + rate * dt;
+
+        ori_euler = ori_quat.To_Euler();
+        ori_euler = ori_euler.To_Degrees();
+
+        GRAPH("x", ori_euler.x, TOP);
+        GRAPH("y", ori_euler.y, TOP);
+        GRAPH("z", ori_euler.z, TOP);
+        printf("%.6f\n", dt);
     }
 }

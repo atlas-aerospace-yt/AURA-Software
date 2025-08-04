@@ -1,8 +1,18 @@
 cmake_minimum_required(VERSION 3.8)
 
-set(CMAKE_CXX_STANDARD 17)
+# Use C++ not C for this project
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(EXTRA_COMPONENT_DIRS core application)
+# Define all files to be included
+set(EXTRA_COMPONENT_DIRS
+    src/main
+    src/common/bus_drivers/I2C
+    src/common/dev_drivers/BMP280
+    src/common/dev_drivers/ICM20948
+    src/common/dev_drivers/INA219
+    lib/Quat)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 

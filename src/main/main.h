@@ -1,20 +1,27 @@
 #pragma once
 
+/* Standard */
 #include <fstream>
 
+/* FreeRTOS */
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 
-#include "esp_vfs_fat.h"
+/* ESP IDF */
 #include "esp_timer.h"
 
-#include "driver/sdmmc_types.h"
-#include "driver/sdspi_host.h"
-#include "driver/gpio.h"
+/* Bus drivers*/
+#include "SPI.h"
+#include "I2C.h"
 
+/* Device drivers */
+#include "SD_Card.h"
 #include "BMP280.h"
 #include "ICM20948.h"
 #include "INA219.h"
+
+/* External */
 #include "Quat.h"
 
 #define TOP ",1,"
@@ -25,7 +32,5 @@
     printf(GRAPHING_BEGINNING);         \
     printf(name);                       \
     printf(type);                       \
-    printf(data);                       \
+    printf("%f", data);                       \
     printf(GRAPHING_ENDING);            \
-
-#define HSPI_HOST SPI2_HOST

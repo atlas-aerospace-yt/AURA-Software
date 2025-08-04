@@ -1,50 +1,30 @@
 #include "main.h"
 
+void my_test_function(void* args)
+{
+    while (true)
+    {
+        printf("CORE 2 doing stuff!\n");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
 extern "C" void app_main(void)
 {
-    spi_bus_config_t spi_config = {};
 
-    spi_config.mosi_io_num = GPIO_NUM_35;
-    spi_config.miso_io_num = GPIO_NUM_37;
-    spi_config.sclk_io_num = GPIO_NUM_36;
-    spi_config.quadwp_io_num = -1;
-    spi_config.quadhd_io_num = -1;
-    spi_config.max_transfer_sz = 4000;
+    spi::create_spi_bus();
 
-    ESP_ERROR_CHECK(spi_bus_initialize(
-        HSPI_HOST,
-        &spi_config,
-        SPI_DMA_CH_AUTO
-    ));
+    sdmmc_card_t sd_card;
 
-    sdmmc_card_t *sd_card;
+    sd_card::mount_sd_card(&sd_card);
 
-    esp_vfs_fat_mount_config_t file_config = {};
-    file_config.format_if_mount_failed = false;
-    file_config.max_files = 5;
-
-    sdmmc_host_t sd_host = SDSPI_HOST_DEFAULT();
-    sd_host.slot = HSPI_HOST;
-
-    sdspi_device_config_t sd_config = SDSPI_DEVICE_CONFIG_DEFAULT();
-    sd_config.gpio_cs = GPIO_NUM_13;
-    sd_config.host_id = HSPI_HOST;
-
-    ESP_ERROR_CHECK(esp_vfs_fat_sdspi_mount(
-        "/sdcard",
-        &sd_host,
-        &sd_config,
-        &file_config,
-        &sd_card
-    ));
-
-    std::ofstream MyFile("/sdcard/big_cock.txt");
-    MyFile << "I have a massive weiner!";
+    std::ofstream MyFile("/sdcard/test.txt");
+    MyFile << "Hello World!";
     MyFile.close();
 
-    esp_vfs_fat_sdcard_unmount("/sdcard", sd_card);
+    sd_card::unmount_sd_card(&sd_card);
 
-    /*i2c::i2c_bus my_bus(GPIO_NUM_8, GPIO_NUM_9);
+    i2c::i2c_bus my_bus(GPIO_NUM_8, GPIO_NUM_9);
     bmp280::bmp280 my_bmp(&my_bus);
     icm20948::icm20948 my_icm(&my_bus);
     //ina219::ina219 my_ina(&my_bus);
@@ -71,11 +51,21 @@ extern "C" void app_main(void)
 
     x_offs /= 1000.0f;
     y_offs /= 1000.0f;
-    z_offs /= 1000.0f;*/
+    z_offs /= 1000.0f;
+
+    xTaskCreatePinnedToCore(
+        my_test_function,
+        "Core2",
+        4096,
+        NULL,
+        tskIDLE_PRIORITY + 1,
+        NULL,
+        1
+    );
 
     while (true)
     {
-        /*now = esp_timer_get_time();
+        now = esp_timer_get_time();
         delta_us = now - last_time;
         last_time = now;
 
@@ -97,9 +87,6 @@ extern "C" void app_main(void)
         GRAPH("x", ori_euler.x, TOP);
         GRAPH("y", ori_euler.y, TOP);
         GRAPH("z", ori_euler.z, TOP);
-        printf("%.6f\n", dt);*/
-
-        printf("Running...\n");
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        printf("%.6f\n", dt);
     }
 }

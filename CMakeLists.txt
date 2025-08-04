@@ -9,9 +9,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(EXTRA_COMPONENT_DIRS
     src/main
     src/common/bus_drivers/I2C
+    src/common/bus_drivers/SPI
     src/common/dev_drivers/BMP280
     src/common/dev_drivers/ICM20948
     src/common/dev_drivers/INA219
+    src/common/dev_drivers/SD_Card
     lib/Quat)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)

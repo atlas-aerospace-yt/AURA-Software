@@ -19,12 +19,20 @@ void core_1_task(void *args)
 
     while (true)
     {
-        vTaskDelay(10);
+        vTaskDelay(pdMS_TO_TICKS(10));
+
         if (xQueueReceive(controlOutputQueue, &my_data, MAX_DELAY)) {
             ESP_LOGI("LOGGER", "Delta Time: %.8f",my_data.dt);
             GRAPH("GyroX", my_data.gyro_x, TOP);
             GRAPH("GyroY", my_data.gyro_y, TOP);
             GRAPH("GyroZ", my_data.gyro_z, TOP);
+
+            GRAPH("Height", my_data.height, TOP);
+
+            GRAPH("Temp", my_data.temp, BOT);
+            GRAPH("Voltage", my_data.voltage, BOT);
+            GRAPH("Current", my_data.current, BOT);
+            GRAPH("Power", my_data.power, BOT);
         }
     }
 }

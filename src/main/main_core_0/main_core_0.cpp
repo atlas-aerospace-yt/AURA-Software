@@ -15,7 +15,7 @@ void core_0_task(void *args)
 
     bmp280::bmp280 my_bmp(&my_bus);
     icm20948::icm20948 my_icm(&my_bus);
-    //ina219::ina219 my_ina(&my_bus);
+    ina219::ina219 my_ina(&my_bus);
 
     Quat rate;
     Quat gyro = {0.0f, 0.0f, 0.0f, 0.0f};
@@ -51,6 +51,14 @@ void core_0_task(void *args)
         dt = (float)delta_us / 1e6f;
 
         my_icm.update();
+        my_bmp.update();
+
+        my_data.temp = my_bmp.get_temperature();
+        my_data.height = my_bmp.get_altitude();
+        my_data.voltage = my_ina.get_voltage();
+        my_data.current = my_ina.get_current();
+        my_data.power = my_ina.get_power();
+
         gyro.i = my_icm.gyro_x - x_offs;
         gyro.j = my_icm.gyro_y - y_offs;
         gyro.k = my_icm.gyro_z - z_offs;
@@ -65,12 +73,8 @@ void core_0_task(void *args)
         my_data.gyro_x = ori_euler.x;
         my_data.gyro_y = ori_euler.y;
         my_data.gyro_z = ori_euler.z;
-        my_data.dt = dt;
 
-        //GRAPH("x", ori_euler.x, TOP);
-        //GRAPH("y", ori_euler.y, TOP);
-        //GRAPH("z", ori_euler.z, TOP);
-        //printf("%.6f\n", dt);
+        my_data.dt = dt;
 
         xQueueOverwrite(controlOutputQueue, &my_data);
     }

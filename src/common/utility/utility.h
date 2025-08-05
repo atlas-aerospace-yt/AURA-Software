@@ -15,4 +15,6 @@
 
 struct sensor_data {
     float gyro_x, gyro_y, gyro_z, dt;
+    float temp, height;
+    float voltage, current, power;
 };

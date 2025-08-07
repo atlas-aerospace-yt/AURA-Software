@@ -2,7 +2,6 @@
 
 extern "C" void app_main(void)
 {
-
     sensor_data example_data;
     QueueHandle_t controlOutputQueue = xQueueCreate(
         1,

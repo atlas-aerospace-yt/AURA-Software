@@ -63,7 +63,6 @@ void core_0_task(void *args)
         gyro.j = my_icm.gyro_y - y_offs;
         gyro.k = my_icm.gyro_z - z_offs;
 
-
         rate = ori_quat * 0.5f * gyro;
         ori_quat = ori_quat + rate * dt;
 

@@ -15,8 +15,14 @@ float ina219::ina219::get_voltage(void)
 float ina219::ina219::get_current(void)
 {
     uint16_t current;
+    float current_f;
     current = _master_bus->read_bytes_i2c<uint16_t, 2>(_ina_handle, INA_CURRENT);
-    return static_cast<float>(current) / LSB_CURRENT;
+    current_f = static_cast<float>(current) / LSB_CURRENT;
+    if (current_f > MAX_CURRENT)
+    {
+        return 0.0f;
+    }
+    return current_f;
 }
 
 float ina219::ina219::get_power(void)

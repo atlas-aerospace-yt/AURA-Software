@@ -19,6 +19,8 @@
 #define LSB_CURRENT 327.68f
 #define LSB_POWER 16.384
 
+#define MAX_CURRENT 150.0f
+
 namespace ina219
 {    
     class ina219

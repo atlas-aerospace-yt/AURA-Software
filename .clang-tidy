@@ -1,0 +1,18 @@
+Checks: >
+  -*,
+  bugprone-*,
+  performance-*,
+  readability-*,
+  modernize-*,
+  cppcoreguidelines-*,
+  clang-analyzer-*,
+  portability-*,
+  misc-*,
+  google-*,
+  -google-runtime-references,
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+FormatStyle: google
+CheckOptions:
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case

@@ -1,0 +1,21 @@
+name: Lint and Tidy Check
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install clang tools
+        run: sudo apt install clang-format clang-tidy -y
+
+      - name: Run clang-format check
+        run: |
+          find . -regex '.*\.\(cpp\|h\|c\|hpp\)' -exec clang-format --dry-run --Werror {} \;
+
+      - name: Run clang-tidy
+        run: |
+          find . -name '*.cpp' -exec clang-tidy {} -- -Iinclude \;

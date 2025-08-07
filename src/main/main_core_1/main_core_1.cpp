@@ -1,38 +1,42 @@
+/**
+ * The code to run on core 1 of the ESP32-S3 processor.
+ *
+ */
+
 #include "main_core_1.h"
 
-void core_1_task(void *args)
-{
-    QueueHandle_t controlOutputQueue = (QueueHandle_t)args;
-    sensor_data my_data;
+void core_1_task(void *args) {
+  QueueHandle_t controlOutputQueue = (QueueHandle_t)args;
+  sensor_data my_data;
 
-    spi::create_spi_bus();
+  spi::create_spi_bus();
 
-    sdmmc_card_t sd_card;
+  sdmmc_card_t sd_card;
 
-    flash::flash my_flash(GPIO_NUM_21);
+  flash::flash my_flash(GPIO_NUM_21);
 
-    sd_card::mount_sd_card(&sd_card);
-    my_flash.mount_fat_partition();
+  sd_card::mount_sd_card(&sd_card);
+  my_flash.mount_fat_partition();
 
-    sd_card::unmount_sd_card(&sd_card);
-    my_flash.unmount_fat_partition();
+  sd_card::unmount_sd_card(&sd_card);
+  my_flash.unmount_fat_partition();
 
-    while (true)
-    {
-        vTaskDelay(pdMS_TO_TICKS(10));
+  while (true) {
+    vTaskDelay(pdMS_TO_TICKS(10));
 
-        if (xQueueReceive(controlOutputQueue, &my_data, MAX_DELAY)) {
-            ESP_LOGI("LOGGER", "Delta Time: %.8f",my_data.dt);
-            GRAPH("GyroX", my_data.gyro_x, TOP);
-            GRAPH("GyroY", my_data.gyro_y, TOP);
-            GRAPH("GyroZ", my_data.gyro_z, TOP);
+    if (xQueueReceive(controlOutputQueue, &my_data, MAX_DELAY)) {
+      ESP_LOGI("LOGGER", "Delta Time: %.8f", my_data.dt);
 
-            GRAPH("Height", my_data.height, TOP);
+      GRAPH("GyroX", my_data.gyro_x, TOP);
+      GRAPH("GyroY", my_data.gyro_y, TOP);
+      GRAPH("GyroZ", my_data.gyro_z, TOP);
 
-            GRAPH("Temp", my_data.temp, BOT);
-            GRAPH("Voltage", my_data.voltage, BOT);
-            GRAPH("Current", my_data.current, BOT);
-            GRAPH("Power", my_data.power, BOT);
-        }
+      GRAPH("Height", my_data.height, TOP);
+
+      GRAPH("Temp", my_data.temp, BOT);
+      GRAPH("Voltage", my_data.voltage, BOT);
+      GRAPH("Current", my_data.current, BOT);
+      GRAPH("Power", my_data.power, BOT);
     }
+  }
 }

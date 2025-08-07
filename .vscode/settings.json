@@ -7,13 +7,16 @@
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"
   },
+
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+
   "clangd.path": "C:\\Users\\Alexander_Armitage\\.espressif\\tools\\esp-clang\\esp-19.1.2_20250312\\esp-clang\\bin\\clangd.exe",
   "clangd.arguments": [
     "--background-index",
     "--query-driver=C:\\Users\\Alexander_Armitage\\.espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
     "--compile-commands-dir=c:\\Users\\Alexander_Armitage\\Documents\\GitHub\\AURA-Software\\build"
   ],
-  "C_Cpp.errorSquiggles": "disabled",
+  "C_Cpp.errorSquiggles": "enabled",
   "files.associations": {
     "*.json.liquid": "json",
     "*.yaml.liquid": "yaml",
@@ -24,5 +27,11 @@
     "exception": "cpp",
     "new": "cpp",
     "string": "cpp"
-  }
+  },
+
+  "C_Cpp.default.compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
+
+  "c-cpp-flylint.cppcheck.enable": true,
+  "c-cpp-flylint.cppcheck.executable": "cppcheck",
+  "c-cpp-flylint.clang.enable": false
 }

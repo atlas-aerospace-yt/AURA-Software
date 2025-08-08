@@ -10,11 +10,11 @@
   "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
   "C_Cpp.default.compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
   "editor.formatOnSave": true,
-  "C_Cpp.clang_format_style": "file",
-  "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-  "C_Cpp.codeAnalysis.clangTidy.codeAction.formatFixes": true,
+  //"C_Cpp.clang_format_style": "file",
+  //"C_Cpp.codeAnalysis.clangTidy.enabled": true,
   "C_Cpp.default.includePath": [
+    "${workspaceFolder}/tests/googletest/googletest/include",
     "${workspaceFolder}/**"
   ],
-  "C_Cpp.default.cppStandard": "c++17"
+  "C_Cpp.default.cppStandard": "c++23"
 }

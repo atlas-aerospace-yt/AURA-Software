@@ -1,18 +1,20 @@
 Checks: >
-  -*,
-  bugprone-*,
-  performance-*,
-  readability-*,
-  modernize-*,
-  cppcoreguidelines-*,
   clang-analyzer-*,
-  portability-*,
+  bugprone-*,
   misc-*,
+  readability-*,
   google-*,
-  -google-runtime-references,
+  -modernize-*,
+  -cppcoreguidelines-*,
+  -readability-identifier-naming.GlobalConstantCase,
+  -google-runtime-references
+
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 FormatStyle: google
+
 CheckOptions:
-  - key:             readability-identifier-naming.VariableCase
-    value:           lower_case
+  - { key: readability-identifier-naming.VariableCase, value: lower_case }
+  - { key: readability-identifier-naming.FunctionCase, value: CamelCase }
+  - { key: readability-identifier-naming.ConstantCase, value: UPPER_CASE }
+  - { key: readability-identifier-naming.MacroDefinitionCase, value: UPPER_CASE }

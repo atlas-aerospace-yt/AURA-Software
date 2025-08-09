@@ -24,9 +24,6 @@ jobs:
         cd esp-idf
         ./install.sh
 
-    - name: Export ESP-IDF environment variables
-      run: echo "source $HOME/esp/esp-idf/export.sh" >> $GITHUB_ENV
-
     - name: Build project and generate compile commands
       run: |
         source $HOME/esp/esp-idf/export.sh

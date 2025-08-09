@@ -9,22 +9,32 @@ on:
 jobs:
   clang-tidy:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup ESP-IDF
-      uses: espressif/esp-idf-action@v2
-      with:
-        version: 'latest'
+    - name: Install prerequisites
+      run: sudo apt-get update && sudo apt-get install -y git wget python3 python3-pip ninja-build clang-tidy
 
-    - name: Install clang-tidy
-      run: sudo apt-get update && sudo apt-get install -y clang-tidy
-
-    - name: Configure build (generate compile_commands.json)
-      run: idf.py fullclean && idf.py build
-
-    - name: Run clang-tidy on source files
+    - name: Install ESP-IDF
       run: |
+        mkdir -p $HOME/esp
+        cd $HOME/esp
+        git clone --recursive https://github.com/espressif/esp-idf.git
+        cd esp-idf
+        ./install.sh
+
+    - name: Export ESP-IDF environment variables
+      run: echo "source $HOME/esp/esp-idf/export.sh" >> $GITHUB_ENV
+
+    - name: Build project and generate compile commands
+      run: |
+        source $HOME/esp/esp-idf/export.sh
+        idf.py fullclean
+        idf.py build
+
+    - name: Run clang-tidy
+      run: |
+        source $HOME/esp/esp-idf/export.sh
         cd build
-        # Run clang-tidy with the compile commands database
         clang-tidy -p . $(find ../main ../components -name '*.c' -o -name '*.cpp') --quiet

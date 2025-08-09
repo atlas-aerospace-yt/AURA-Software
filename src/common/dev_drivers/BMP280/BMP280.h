@@ -7,6 +7,7 @@
 #pragma once
 
 #include "I2C.h"
+#include "math.h"
 
 namespace bmp280 {
 
@@ -71,9 +72,9 @@ class bmp280 {
 
   float _initial_pressure = 0.0F;
 
-  void _set_mode(void);
-  void _calibrate(void);
-  void _get_compensated_temp(void);
+  void _set_mode();
+  void _calibrate();
+  void _get_compensated_temp();
 
  public:
   explicit bmp280(i2c::i2c_bus* master_bus, uint8_t addr = BMP_ADDR);
@@ -84,27 +85,27 @@ class bmp280 {
   // Read all registers and calculated the compensated temperature as  it
   // is needed for both pressure and temperature calculations
   //
-  void update(void);
+  void update();
 
   //
   // Calculate the pressure using the equation from the datasheet
   //
   // @returns float the sensed pressure in kPa
   //
-  float get_pressure(void) const;
+  [[nodiscard]] auto get_pressure() const -> float;
 
   //
   // Calculate the temperature using the equation from the datasheet
   //
   // @returns float the sensed temperature in degrees Celsius
   //
-  float get_temperature(void) const;
+  [[nodiscard]] auto get_temperature() const -> float;
 
   //
   // Calculate the altitude based off of the sensed pressure
   //
   // @returns float the calculated altitude in m
   //
-  float get_altitude(void) const;
+  [[nodiscard]] auto get_altitude() const -> float;
 };
 };  // namespace bmp280

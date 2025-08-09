@@ -6,8 +6,6 @@
 //
 #include "BMP280.h"
 
-#include "math.h"
-
 namespace bmp280 {
 
 bmp280::bmp280(i2c::i2c_bus* master_bus, uint8_t addr) : _master_bus(master_bus), _bmp_addr(addr) {
@@ -24,7 +22,7 @@ bmp280::bmp280(i2c::i2c_bus* master_bus, uint8_t addr) : _master_bus(master_bus)
 }
 
 // NOLINTBEGIN(misc-magic-numbers, readability-magic-numbers)
-void bmp280::_set_mode(void) {
+void bmp280::_set_mode() {
   uint8_t ctrl_meas_init = 0;
   ctrl_meas_init |= static_cast<uint8_t>(TEMP_OVERSAMPLE << 5);
   ctrl_meas_init |= static_cast<uint8_t>(PRESS_OVERSAMPLE << 2);
@@ -34,7 +32,7 @@ void bmp280::_set_mode(void) {
 }
 // NOLINTEND(misc-magic-numbers, readability-magic-numbers)
 
-void bmp280::_calibrate(void) {
+void bmp280::_calibrate() {
   _dig_t1 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_T1);
   _dig_t2 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_T2);
   _dig_t3 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_T3);
@@ -49,11 +47,12 @@ void bmp280::_calibrate(void) {
   _dig_p9 = _master_bus->read_bytes_i2c<uint16_t, 2>(_bmp_handle, BMP_DIG_P9);
 }
 
-// NOLINTBEGIN(misc-magic-numbers, readability-magic-numbers)
+// NOLINTBEGIN(misc-magic-numbers, readability-magic-numbers,
+// readability-convert-member-functions-to-static)
 // clang-format off
-void bmp280::_get_compensated_temp(void) {
-  uint32_t var1;
-  uint32_t var2;
+void bmp280::_get_compensated_temp() {
+  int32_t var1;
+  int32_t var2;
 
   var1 = ((((_raw_temp >> 3) - (static_cast<int32_t>(_dig_t1) << 1)) *
           static_cast<int32_t>(_dig_t2)) >> 11);
@@ -66,10 +65,10 @@ void bmp280::_get_compensated_temp(void) {
 // clang-format on
 
 void bmp280::set_height(float acc_height) {
-  // TODO
+  // TODO(Alexander)
 }
 
-void bmp280::update(void) {
+void bmp280::update() {
   uint64_t temp_and_pressure;
 
   temp_and_pressure = _master_bus->read_bytes_i2c<uint64_t, 6>(_bmp_handle, BMP_PRESS_DATA);
@@ -78,7 +77,7 @@ void bmp280::update(void) {
   _get_compensated_temp();
 }
 
-float bmp280::get_pressure(void) const {
+[[nodiscard]] auto bmp280::get_pressure() const -> float {
   int64_t var1;
   int64_t var2;
   int64_t pressure;
@@ -104,16 +103,17 @@ float bmp280::get_pressure(void) const {
   return static_cast<float>(pressure) / 256000.0F;
 }
 
-float bmp280::get_temperature(void) const {
+[[nodiscard]] auto bmp280::get_temperature() const -> float {
   return static_cast<float>((_comp_temp * 5 + 128) >> 8) / 100.0F;
 }
 
-float bmp280::get_altitude(void) const {
+[[nodiscard]] auto bmp280::get_altitude() const -> float {
   const float pressure = get_pressure();
   const float curr_press_hpa = pressure / 10.0F;
   const float init_press_hpa = _initial_pressure / 10.0F;
 
   return static_cast<float>(44330 * (1.0 - pow(curr_press_hpa / init_press_hpa, 0.1903F)));
 }
-// NOLINTEND(misc-magic-numbers, readability-magic-numbers)
+// NOLINTEND(misc-magic-numbers, readability-magic-numbers,
+// readability-convert-member-functions-to-static)
 }  // namespace bmp280

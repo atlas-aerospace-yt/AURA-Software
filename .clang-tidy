@@ -4,17 +4,13 @@ Checks: >
   misc-*,
   readability-*,
   google-*,
-  -modernize-*,
-  -cppcoreguidelines-*,
+  modernize-*,
   -readability-identifier-length,
   -bugprone-easily-swappable-parameters,
-  -google-runtime-references,
-  -misc-include-cleaner
+  -cppcoreguidelines-*,
+  -misc-include-cleaner,
+  -misc-const-correctness
 
-WarningsAsErrors: ''
-HeaderFilterRegex: '.*'
+WarningsAsErrors: '*'
+HeaderFilterRegex: '^(./src|./lib)'
 FormatStyle: google
-
-CheckOptions:
-  - key:             readability-magic-numbers.IgnoreValues
-    value:           '0,0.5,1,2.0F'

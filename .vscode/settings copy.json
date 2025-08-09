@@ -1,7 +1,6 @@
 {
   "editor.formatOnType": true,
   "editor.formatOnSave": true,
-  // ESP-IDF settings
   "idf.flashType": "DFU",
   "idf.portWin": "COM3",
   "idf.openOcdConfigs": [
@@ -10,25 +9,18 @@
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"
   },
-  // C++ include paths
   "C_Cpp.default.includePath": [
     "${workspaceFolder}/tests/googletest/googletest/include",
     "${workspaceFolder}/**",
     "${env:IDF_PATH}/components/**",
     "${env:IDF_PATH}/components/freertos/include",
     "${env:IDF_PATH}/components/driver/include",
-    "${env:IDF_PATH}/components/esp_common/include",
-    "${env:IDF_TOOLS_PATH}/tools/**"
+    "${env:IDF_PATH}/components/esp_common/include"
   ],
   "C_Cpp.clang_format_style": "file",
   "C_Cpp.default.cppStandard": "c++23",
-  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
-  // clang-tidy integration
-  "C_Cpp.codeAnalysis.runAutomatically": true,
   "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-  "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true, // match build compile flags
-  // No overriding of .clang-tidy rules here unless intentional
   "C_Cpp.codeAnalysis.clangTidy.args": [
-    "--quiet"
+    "-static-libasan"
   ]
 }

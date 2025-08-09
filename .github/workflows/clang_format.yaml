@@ -1,21 +1,30 @@
-name: Lint and Tidy Check
+name: clang-tidy check
 
-on: [push, pull_request]
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
 
 jobs:
-  lint:
+  clang-tidy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v3
 
-      - name: Install clang tools
-        run: sudo apt install clang-format clang-tidy -y
+    - name: Setup ESP-IDF
+      uses: espressif/esp-idf-action@v2
+      with:
+        version: 'latest'
 
-      - name: Run clang-format check
-        run: |
-          find . -regex '.*\.\(cpp\|h\|c\|hpp\)' -exec clang-format --dry-run --Werror {} \;
+    - name: Install clang-tidy
+      run: sudo apt-get update && sudo apt-get install -y clang-tidy
 
-      - name: Run clang-tidy
-        run: |
-          find . -name '*.cpp' -exec clang-tidy {} -- -Iinclude \;
+    - name: Configure build (generate compile_commands.json)
+      run: idf.py fullclean && idf.py build
+
+    - name: Run clang-tidy on source files
+      run: |
+        cd build
+        # Run clang-tidy with the compile commands database
+        clang-tidy -p . $(find ../main ../components -name '*.c' -o -name '*.cpp') --quiet

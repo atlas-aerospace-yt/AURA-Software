@@ -1,4 +1,6 @@
 {
+  "editor.formatOnType": true,
+  "editor.formatOnSave": true,
   "idf.flashType": "DFU",
   "idf.portWin": "COM3",
   "idf.openOcdConfigs": [
@@ -7,14 +9,21 @@
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"
   },
-  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
-  "C_Cpp.default.compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
-  "editor.formatOnSave": true,
-  "C_Cpp.clang_format_style": "file",
-  "C_Cpp.codeAnalysis.clangTidy.enabled": true,
   "C_Cpp.default.includePath": [
     "${workspaceFolder}/tests/googletest/googletest/include",
-    "${workspaceFolder}/**"
+    "${workspaceFolder}/**",
+    "${env:IDF_PATH}/components/**",
+    "${env:IDF_PATH}/components/freertos/include",
+    "${env:IDF_PATH}/components/driver/include",
+    "${env:IDF_PATH}/components/esp_common/include"
   ],
-  "C_Cpp.default.cppStandard": "c++23"
+  "C_Cpp.clang_format_style": "file",
+  "C_Cpp.default.cppStandard": "c++17",
+  "C_Cpp.default.intelliSenseMode": "gcc-arm",
+  "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+  "C_Cpp.codeAnalysis.clangTidy.args": [
+    "-static-libasan"
+  ],
+  "C_Cpp.default.configurationProvider": "espressif.esp-idf-extension",
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json"
 }

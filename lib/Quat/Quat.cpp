@@ -5,65 +5,40 @@
 
 #include "Quat.h"
 
+#include <algorithm>
+#include <cmath>
+
+namespace ori {
+
 // Euler angles from quaternions
-Vect Quat::To_Euler()
-{
-  Vect ypr;
+[[nodiscard]] Vect Quat::to_euler() const {
+  const float x1 = (2.0F * i_ * j_) - (2.0F * w_ * k_);
+  const float x2 = (2.0F * w_ * w_) + (2.0F * i_ * i_) - 1.0F;
+  const float x_ypr = atan2(x1, x2);
 
-  // X-Axis calculations
-  float x_one  = 2 * i * j - 2 * w * k;
-  float x_two = 2 * w * w + 2 * i * i - 1;
-  ypr.x = atan2(x_one, x_two);
+  const float y_val = (2.0F * i_ * k_) + (2.0F * w_ * j_);
+  const float clamped_y_val = std::clamp(y_val, -1.0F, 1.0F);
+  const float y_ypr = -asin(clamped_y_val);
 
-  // Y_Axis calculations
-  float y = 2 * i * k + 2 * w * j;
-  if (y > 1.0f){
-    ypr.y = -asin(PI * 2 / y); // uses 90 as a failsafe
-  }
-  else{
-    ypr.y = -asin(y);
-  }
+  const float z1 = (2.0F * j_ * k_) - (2.0F * w_ * i_);
+  const float z2 = (2.0F * w_ * w_) + (2.0F * k_ * k_) - 1.0F;
+  const float z_ypr = atan2(z1, z2);
 
-  // Z-Axis calculations
-  float z_one = 2 * j * k - 2 * w * i;
-  float z_two = 2 * w * w + 2 * k * k - 1;
-  ypr.z = atan2(z_one, z_two);
-
-  return ypr;
+  return Vect(x_ypr, y_ypr, z_ypr);
 }
 
-Vect Vect::To_Radians() {
-  Vect ypr;
-
-  ypr.x = x * (PI / 180.0f);
-  ypr.y = y * (PI / 180.0f);
-  ypr.z = z * (PI / 180.0f);
-
-  return ypr;
+[[nodiscard]] Vect Vect::to_radians() const {
+  return Vect(x_ * deg_to_rad, y_ * deg_to_rad, z_ * deg_to_rad);
 }
 
-Vect Vect::To_Degrees() {
-  Vect ypr;
-
-  ypr.x = x * (180.0f / PI);
-  ypr.y = y * (180.0f / PI);
-  ypr.z = z * (180.0f / PI);
-
-  return ypr;
+[[nodiscard]] Vect Vect::to_degrees() const {
+  return Vect(x_ * rad_to_deg, y_ * rad_to_deg, z_ * rad_to_deg);
 }
 
-// Quaternions from angular rate using madgwick paper
-Quat Quat::Update(Vect v, float dt) {
-
-  Quat b = {0, v.x, v.y, v.z};
-  Quat r = {w, i, j, k};
-
-  Quat q = r * 0.5 * b;
-  Quat n = r + (q * dt);
-
-  n.norm = sqrt(n.w * n.w + n.i * n.i + n.j * n.j + n.k * n.k);
-
-  n = n / n.norm;
-
-  return n;
+[[nodiscard]] Quat Quat::update(Vect& v, float dt) const {
+  const Quat omega(0.0F, v.x(), v.y(), v.z());
+  const Quat q_dot = (*this) * 0.5F * omega;
+  return *this + (q_dot * dt);
 }
+
+}  // namespace ori

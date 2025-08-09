@@ -7,116 +7,72 @@
 
 #include "math.h"
 
-#define PI 3.14159
+namespace ori {
+constexpr float PI = 3.14159F;
+constexpr float deg_to_rad = PI / 180.0F;
+constexpr float rad_to_deg = 180.0F / PI;
 
-struct Vect {
-    float x, y, z;
+class Vect {
+ private:
+  float x_{}, y_{}, z_{};
 
-    Vect operator/ (float f) {
-      Vect v;
+ public:
+  constexpr Vect() = default;
+  constexpr Vect(float x, float y, float z) : x_(x), y_(y), z_(z) {}
+  [[nodiscard]] float x() const { return x_; }
+  [[nodiscard]] float y() const { return y_; }
+  [[nodiscard]] float z() const { return z_; }
 
-      v.x = x / f;
-      v.y = y / f;
-      v.z = z / f;
+  [[nodiscard]] Vect operator/(float f) const { return Vect(x_ / f, y_ / f, z_ / f); }
 
-      return v;
-    }
+  [[nodiscard]] Vect operator*(float f) const { return Vect(x_ * f, y_ * f, z_ * f); }
 
-    Vect operator* (float f){
-      Vect v;
+  // Convert from degrees to radians
+  [[nodiscard]] Vect to_radians() const;
 
-      v.x = x * f;
-      v.y = y * f;
-      v.z = z * f;
-
-      return v;
-    }
-
-    Vect To_Radians();
-    Vect To_Degrees();
+  // Convert from radians to degrees
+  [[nodiscard]] Vect to_degrees() const;
 };
 
-struct Quat {
+class Quat {
+ private:
+  float w_{}, i_{}, j_{}, k_{};
 
-    float w, i, j, k, norm;
+ public:
+  constexpr Quat() = default;
+  constexpr Quat(float w, float i, float j, float k) : w_(w), i_(i), j_(j), k_(k) {}
 
-    Quat operator/ (float f) {
-        Quat q;
+  [[nodiscard]] float w() const { return w_; }
+  [[nodiscard]] float i() const { return i_; }
+  [[nodiscard]] float j() const { return j_; }
+  [[nodiscard]] float k() const { return k_; }
 
-        q.w = w / f;
-        q.i = i / f;
-        q.j = j / f;
-        q.k = k / f;
+  [[nodiscard]] Quat operator/(float f) const { return Quat(w_ / f, i_ / f, j_ / f, k_ / f); }
 
-        return q;
-    }
+  [[nodiscard]] Quat operator*(const Quat& q) const {
+    return Quat((w_ * q.w()) - (i_ * q.i()) - (j_ * q.j()) - (k_ * q.k()),
+                (w_ * q.i()) + (i_ * q.w()) + (j_ * q.k()) - (k_ * q.j()),
+                (w_ * q.j()) - (i_ * q.k()) + (j_ * q.w()) + (k_ * q.i()),
+                (w_ * q.k()) + (i_ * q.j()) - (j_ * q.i()) + (k_ * q.w()));
+  }
 
-    Quat operator* (Quat q){
-      Quat r;
+  [[nodiscard]] Quat operator*(float f) const { return Quat(w_ * f, i_ * f, j_ * f, k_ * f); }
 
-      r.w = w * q.w - i * q.i - j * q.j - k * q.k;
-      r.i = w * q.i + i * q.w + j * q.k - k * q.j;
-      r.j = w * q.j - i * q.k + j * q.w + k * q.i;
-      r.k = w * q.k + i * q.j - j * q.i + k * q.w;
+  [[nodiscard]] Quat operator+(const Quat& q) const {
+    return Quat(w_ + q.w(), i_ + q.i(), j_ + q.j(), k_ + q.k());
+  }
 
-      return r;
-    }
+  [[nodiscard]] Quat operator-(const Quat& q) const {
+    return Quat(w_ - q.w(), i_ - q.i(), j_ - q.j(), k_ - q.k());
+  }
 
-    Quat operator* (float f){
-      Quat q;
+  [[nodiscard]] Quat operator+(float f) const { return Quat(w_ + f, i_ + f, j_ + f, k_ + f); }
 
-      q.w = w * f;
-      q.i = i * f;
-      q.j = j * f;
-      q.k = k * f;
+  [[nodiscard]] Quat operator-(float f) const { return Quat(w_ - f, i_ - f, j_ - f, k_ - f); }
 
-      return q;
-    }
-
-    Quat operator+ (Quat q){
-      Quat r;
-
-      r.w = w + q.w;
-      r.i = i + q.i;
-      r.j = j + q.j;
-      r.k = k + q.k;
-
-      return r;
-    }
-
-    Quat operator- (Quat q){
-      Quat r;
-
-      r.w = w - q.w;
-      r.i = i - q.i;
-      r.j = j - q.j;
-      r.k = k - q.k;
-
-      return r;
-    }
-
-    Quat operator+ (float f){
-      Quat r;
-
-      r.w = w + f;
-      r.i = i + f;
-      r.j = j + f;
-      r.k = k + f;
-
-      return r;
-    }
-
-    Quat operator- (float f){
-      Quat r;
-
-      r.w = w - f;
-      r.i = i - f;
-      r.j = j - f;
-      r.k = k - f;
-
-      return r;
-    }
-
-    Quat Update(Vect v, float dt);
-    Vect To_Euler();
+  // Quaternions from angular rate using madgwick paper
+  [[nodiscard]] Quat update(Vect& v, float dt) const;
+  [[nodiscard]] Vect to_euler() const;
 };
+
+}  // namespace ori

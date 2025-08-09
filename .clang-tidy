@@ -6,15 +6,15 @@ Checks: >
   google-*,
   -modernize-*,
   -cppcoreguidelines-*,
-  -readability-identifier-naming.GlobalConstantCase,
-  -google-runtime-references
+  -readability-identifier-length,
+  -bugprone-easily-swappable-parameters,
+  -google-runtime-references,
+  -misc-include-cleaner
 
 WarningsAsErrors: ''
 HeaderFilterRegex: '.*'
 FormatStyle: google
 
 CheckOptions:
-  - { key: readability-identifier-naming.VariableCase, value: lower_case }
-  - { key: readability-identifier-naming.FunctionCase, value: CamelCase }
-  - { key: readability-identifier-naming.ConstantCase, value: UPPER_CASE }
-  - { key: readability-identifier-naming.MacroDefinitionCase, value: UPPER_CASE }
+  - key:             readability-magic-numbers.IgnoreValues
+    value:           '0,0.5,1,2.0F'

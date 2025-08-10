@@ -2,55 +2,66 @@
 
 #include "I2C.h"
 
-#define INA_ADDR 0x41
+namespace ina219 {
 
-#define INA_CONFIG 0x00
-#define INA_SHUNT_V 0x01
-#define INA_BUS_V 0x02
-#define INA_POWER 0x03
-#define INA_CURRENT 0x04
-#define INA_CALIB 0x05
+constexpr uint8_t INA_ADDR = 0x41;
 
-#define I2C_SPEED 100000
+constexpr uint8_t INA_CONFIG = 0x00;
+constexpr uint8_t INA_SHUNT_V = 0x01;
+constexpr uint8_t INA_BUS_V = 0x02;
+constexpr uint8_t INA_POWER = 0x03;
+constexpr uint8_t INA_CURRENT = 0x04;
+constexpr uint8_t INA_CALIB = 0x05;
 
-#define CALIB_VALUE 0xD1B8
+constexpr uint32_t I2C_SPEED = 100000;
 
-#define LSB_BUS_V 2048.0f
-#define LSB_CURRENT 327.68f
-#define LSB_POWER 16.384
+constexpr uint16_t CALIB_VALUE = 0xD1B8;
 
-#define MAX_CURRENT 150.0f
+constexpr float LSB_BUS_V = 2048.0F;
+constexpr float LSB_CURRENT = 327.68F;
+constexpr float LSB_POWER = 16.384F;
 
-namespace ina219
-{    
-    class ina219
-    {
-    private:
-        i2c::i2c_bus* _master_bus;
+constexpr float MAX_CURRENT = 150.0F;
 
-        i2c_master_dev_handle_t _ina_handle;
-        i2c_device_config_t _ina_config = {};
+//
+// A wrapper class to handle communication with an INA219 device connected via the I2c protocol
+//
+class ina219 {
+ private:
+  i2c::i2c_bus* _master_bus;
 
-        void _calibrate(void);
+  i2c_master_dev_handle_t _ina_handle;
+  i2c_device_config_t _ina_config = {};
 
-    public:
-        ina219(i2c::i2c_bus* master_bus)
-            : _master_bus(master_bus)
-        {
-            _ina_config.dev_addr_length = I2C_ADDR_BIT_LEN_7;
-            _ina_config.scl_speed_hz = I2C_SPEED;
-            _ina_config.device_address = INA_ADDR;
+  //
+  // Write the value to the calibration register which corresponds to a 0m5 ohm shunt resistor
+  // and a +- 320mV range
+  //
+  void _calibrate();
 
-            ESP_ERROR_CHECK(_master_bus->add_slave_to_bus(
-                &_ina_config,
-                &_ina_handle
-            ));
+ public:
+  explicit ina219(i2c::i2c_bus* master_bus);
 
-            _calibrate();
-        }
+  //
+  // Read the bus voltage register and convert to V
+  //
+  // @returns float the bus voltage in V
+  //
+  [[nodiscard]] auto get_voltage() const -> float;
 
-        float get_power(void);
-        float get_voltage(void);
-        float get_current(void);
-    };
+  //
+  // Read the current register and convert to A
+  //
+  // @returns float the currrent in A
+  //
+  [[nodiscard]] auto get_current() const -> float;
+
+  //
+  // Read the power register and convert to W
+  //
+  // @returns float the power in W
+  //
+  [[nodiscard]] auto get_power() const -> float;
 };
+
+};  // namespace ina219

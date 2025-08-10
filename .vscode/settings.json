@@ -30,5 +30,14 @@
   // No overriding of .clang-tidy rules here unless intentional
   "C_Cpp.codeAnalysis.clangTidy.args": [
     "--quiet"
-  ]
+  ],
+  "files.associations": {
+    "*.json.liquid": "json",
+    "*.yaml.liquid": "yaml",
+    "*.md.liquid": "markdown",
+    "*.js.liquid": "liquid-javascript",
+    "*.css.liquid": "liquid-css",
+    "*.scss.liquid": "liquid-scss",
+    "cstdint": "cpp"
+  }
 }

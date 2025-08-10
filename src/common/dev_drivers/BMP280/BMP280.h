@@ -44,6 +44,9 @@ constexpr uint32_t I2C_SPEED = 100000;
 
 constexpr uint32_t TEMP_AND_PRESS_MASK = 0xFFFFF;
 
+//
+// A wrapper class to handle communication with a BMP280 device connected via the I2c protocol
+//
 class bmp280 {
  private:
   i2c::i2c_bus* _master_bus;
@@ -51,7 +54,7 @@ class bmp280 {
   i2c_master_dev_handle_t _bmp_handle;
   i2c_device_config_t _bmp_config{};
 
-  uint8_t _bmp_addr;
+  const uint8_t _bmp_addr;
   int32_t _comp_temp{};
   int32_t _raw_temp{};
   int32_t _raw_pressure{};
@@ -72,18 +75,36 @@ class bmp280 {
 
   float _initial_pressure = 0.0F;
 
+  //
+  // Set the modes of the BMP240 to start reading pressure data
+  //
   void _set_mode();
+
+  //
+  // Get all parameters needed to calulate temperature and pressure as described in the BMP280
+  // datasheet
+  //
   void _calibrate();
+
+  //
+  // Calculate the compensated temperature as described in the datasheet (needed for both pressure
+  // and temperature calculations)
+  //
   void _get_compensated_temp();
 
  public:
   explicit bmp280(i2c::i2c_bus* master_bus, uint8_t addr = BMP_ADDR);
 
+  //
+  // Set the current height so all altitude readings are correct relative to a point
+  // If this function is never called, a height of zero will correspond to the altitude at which
+  // the device was first turned on
+  //
   void set_height(float acc_height);
 
   //
-  // Read all registers and calculated the compensated temperature as  it
-  // is needed for both pressure and temperature calculations
+  // Read all registers and calculate the compensated temperature as it is needed for both pressure
+  // and temperature calculations
   //
   void update();
 

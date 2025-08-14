@@ -1,4 +1,4 @@
-name: clang-tidy check
+name: Build and clang-tidy check
 
 on:
   pull_request:
@@ -24,7 +24,7 @@ jobs:
         cd esp-idf
         ./install.sh
 
-    - name: Build project and generate compile commands
+    - name: Run build project
       run: |
         source $HOME/esp/esp-idf/export.sh
         idf.py fullclean

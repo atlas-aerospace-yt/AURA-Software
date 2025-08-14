@@ -15,7 +15,8 @@ constexpr uint8_t INA_CALIB = 0x05;
 
 constexpr uint32_t I2C_SPEED = 100000;
 
-constexpr uint16_t CALIB_VALUE = 0xD1B8;
+constexpr uint16_t CALIB_VALUE_1 = 0xD1;
+constexpr uint16_t CALIB_VALUE_2 = 0xB8;
 
 constexpr float LSB_BUS_V = 2048.0F;
 constexpr float LSB_CURRENT = 327.68F;

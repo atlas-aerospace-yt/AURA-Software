@@ -13,7 +13,8 @@ ina219::ina219(i2c::i2c_bus* master_bus) : _master_bus(master_bus) {
 }
 
 void ina219::_calibrate() {
-  _master_bus->write_bytes_i2c<uint16_t, 2>(_ina_handle, INA_CALIB, CALIB_VALUE);
+  uint8_t calib_buffer[2] = {CALIB_VALUE_1, CALIB_VALUE_2};
+  _master_bus->write_bytes_i2c<2>(_ina_handle, INA_CALIB, calib_buffer);
 }
 
 auto ina219::get_voltage() const -> float {

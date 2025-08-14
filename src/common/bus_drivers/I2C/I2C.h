@@ -129,27 +129,27 @@ class i2c_bus final {
   }
 
   //
-  // Write n bytes to a register of an i2c device.
+  // Write n bytes to a register of an i2c device. The data array must have [0] as the register
+  // address.
   //
   // @param dev_handle the device handle
-  // @param reg_addr the register address which you start writing to
   // @param data the bytes to be written to the address
+  // @prma len the number, n, of bytes to write
   //
   // @returns esp_err_t the ESP error code from i2c_master_transmit
   //
-  template <typename T, size_t N>
+  template <size_t N>
   [[nodiscard]] esp_err_t write_bytes_i2c(i2c_master_dev_handle_t dev_handle, uint8_t reg_addr,
-                                          T data) {
-    uint8_t write_buf[N + 1];
-    write_buf[0] = reg_addr;
+                                          uint8_t* data) {
+    uint8_t buf[N + 1];
+    buf[0] = reg_addr;
 
     for (int i = 1; i <= N; i++) {
-      T shift = ((N - i) * BYTE_LEN);
-      write_buf[i] = static_cast<uint8_t>((data >> shift) & BYTE_MASK);
+      buf[i] = data[i - 1];
     }
 
-    return i2c_master_transmit(dev_handle, write_buf, sizeof(write_buf),
-                               pdMS_TO_TICKS(I2C_MASTER_TIMEOUT_MS));
+    return i2c_master_transmit(dev_handle, buf, N + 1, pdMS_TO_TICKS(I2C_MASTER_TIMEOUT_MS));
   }
 };
-};  // namespace i2c
+
+}  // namespace i2c

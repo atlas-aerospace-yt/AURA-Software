@@ -18,6 +18,7 @@ set(EXTRA_COMPONENT_DIRS
     src/common/dev_drivers/PCA9685
     src/common/dev_drivers/SD_Card
     src/common/dev_drivers/Flash
+    src/common/dev_drivers/FSA8S
     src/common/utility
     lib/Quat)
 

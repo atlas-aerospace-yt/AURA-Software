@@ -5,7 +5,7 @@
 
 #include "main_core_1.h"
 
-void core_1_task(void *args) {
+void core_1_task(void* args) {
   QueueHandle_t controlOutputQueue = (QueueHandle_t)args;
   sensor_data my_data;
 
@@ -25,7 +25,13 @@ void core_1_task(void *args) {
     vTaskDelay(pdMS_TO_TICKS(10));
 
     if (xQueueReceive(controlOutputQueue, &my_data, MAX_DELAY)) {
-      ESP_LOGI("LOGGER", "Delta Time: %.8f", my_data.dt);
+      printf("%d ", my_data.ch1);
+      printf("%d ", my_data.ch2);
+      printf("%d ", my_data.ch3);
+      printf("%d ", my_data.ch4);
+      printf("%d ", my_data.ch5);
+      printf("%d ", my_data.ch6);
+      printf("Delta Time: %.8f\n", my_data.dt);
 
       GRAPH("GyroX", my_data.gyro_x, TOP);
       GRAPH("GyroY", my_data.gyro_y, TOP);

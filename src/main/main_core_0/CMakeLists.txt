@@ -6,4 +6,5 @@ idf_component_register(SRCS ./main_core_0.cpp
                             ICM20948
                             INA219
                             Quat
+                            FSA8S
 )

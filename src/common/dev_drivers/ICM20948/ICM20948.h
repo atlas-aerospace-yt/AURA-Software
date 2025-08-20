@@ -15,7 +15,7 @@
 
 namespace icm20948 {
 
-constexpr uint32_t I2C_SPEED = 100000;
+constexpr uint32_t I2C_SPEED = 1100000;
 
 /* ICM20948 default I2C address on AURA PCB */
 constexpr uint8_t ICM_ADDR = 0x68;

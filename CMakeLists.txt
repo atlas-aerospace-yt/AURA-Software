@@ -20,7 +20,9 @@ set(EXTRA_COMPONENT_DIRS
     src/common/dev_drivers/Flash
     src/common/dev_drivers/FSA8S
     src/common/utility
-    lib/Quat)
+    lib/Quat
+    lib/PID
+)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 

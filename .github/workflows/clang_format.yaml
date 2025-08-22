@@ -34,4 +34,4 @@ jobs:
       run: |
         source $HOME/esp/esp-idf/export.sh
         cd build
-        clang-tidy ../src/main/main.cpp -p . -extra-arg=-I$HOME/esp/idf-tools**
+        clang-tidy ../src/main/main.cpp -p . -extra-arg=-target=x86_64-linux-gnu -extra-arg=-I$HOME/esp/idf-tools**

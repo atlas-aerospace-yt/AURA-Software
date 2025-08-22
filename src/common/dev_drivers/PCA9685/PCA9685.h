@@ -20,7 +20,7 @@ constexpr uint8_t MAX_CH_NUM = 15;
 
 constexpr uint8_t REG_ADDR_SEP_CNT = 0x04;
 
-constexpr uint32_t I2C_SPEED = 100000;
+constexpr uint32_t I2C_SPEED = 1200000;
 
 constexpr uint8_t ESC_FREQ = 50;
 constexpr uint8_t ESC_OFF = 0;
@@ -112,7 +112,7 @@ class pca_esc {
 
   const uint8_t _channel;
   const uint16_t _min = 205;
-  const uint16_t _max = 410;
+  const uint16_t _max = 310;
 
  public:
   explicit pca_esc(pca9685* pca_handle, uint8_t channel);

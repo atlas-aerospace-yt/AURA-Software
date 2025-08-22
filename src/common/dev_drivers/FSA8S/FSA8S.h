@@ -12,6 +12,8 @@ constexpr uint8_t IBUS_START_2 = 0x40;
 
 constexpr size_t UART_BUF_SIZE = 256;
 
+constexpr TickType_t TIMEOUT = pdMS_TO_TICKS(3);
+
 //
 // A receiver object to deal with handling the FlySky iBus protocol
 //
@@ -30,16 +32,11 @@ class receiver {
   uint16_t _ch6{};
 
   //
-  // Put the data from UART into the buffer to be processed.
-  //
-  auto _recv_uart() -> void;
-
-  //
   // Get the index of the 0x20 from the start bytes of the iBus protocol
   //
   // @returns int16_t -1 to BUFFER_SIZE where -1 is only if the start is not found
   //
-  auto _get_frame_start() const -> int16_t;
+  [[nodiscard]] auto _get_frame_start() const -> int16_t;
 
   //
   // Convert the data in the buffer into useable values (1000-2000) which are saved in the _ch*
@@ -52,12 +49,12 @@ class receiver {
  public:
   explicit receiver(gpio_num_t rx_pin, uart_port_t uart_port = UART_NUM_1);
 
-  auto ch1() const -> uint16_t { return _ch1; }
-  auto ch2() const -> uint16_t { return _ch2; }
-  auto ch3() const -> uint16_t { return _ch3; }
-  auto ch4() const -> uint16_t { return _ch4; }
-  auto ch5() const -> uint16_t { return _ch5; }
-  auto ch6() const -> uint16_t { return _ch6; }
+  [[nodiscard]] auto ch1() const -> uint16_t { return _ch1; }
+  [[nodiscard]] auto ch2() const -> uint16_t { return _ch2; }
+  [[nodiscard]] auto ch3() const -> uint16_t { return _ch3; }
+  [[nodiscard]] auto ch4() const -> uint16_t { return _ch4; }
+  [[nodiscard]] auto ch5() const -> uint16_t { return _ch5; }
+  [[nodiscard]] auto ch6() const -> uint16_t { return _ch6; }
 
   //
   // Read the UART data from the FS-A8S and parse the data to update the channel values

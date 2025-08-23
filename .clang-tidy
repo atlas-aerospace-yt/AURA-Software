@@ -12,5 +12,4 @@ Checks: >
   -misc-const-correctness
 
 WarningsAsErrors: '*'
-HeaderFilterRegex: '^(./src|./lib)'
 FormatStyle: google

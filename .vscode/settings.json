@@ -12,13 +12,9 @@
   },
   // C++ include paths
   "C_Cpp.default.includePath": [
-    "${workspaceFolder}/tests/googletest/googletest/include",
     "${workspaceFolder}/**",
     "${env:IDF_PATH}/components/**",
-    "${env:IDF_PATH}/components/freertos/include",
-    "${env:IDF_PATH}/components/driver/include",
-    "${env:IDF_PATH}/components/esp_common/include",
-    "${env:IDF_TOOLS_PATH}/tools/**"
+    "${env:IDF_TOOLS_PATH}/tools/**",
   ],
   "C_Cpp.clang_format_style": "file",
   "C_Cpp.default.cppStandard": "c++23",
@@ -26,10 +22,10 @@
   // clang-tidy integration
   "C_Cpp.codeAnalysis.runAutomatically": true,
   "C_Cpp.codeAnalysis.clangTidy.enabled": true,
-  "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true, // match build compile flags
+  "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true,
   // No overriding of .clang-tidy rules here unless intentional
   "C_Cpp.codeAnalysis.clangTidy.args": [
-    "--quiet"
+    "-I${env:IDF_TOOLS_PATH}**"
   ],
   "files.associations": {
     "*.json.liquid": "json",
@@ -38,16 +34,16 @@
     "*.js.liquid": "liquid-javascript",
     "*.css.liquid": "liquid-css",
     "*.scss.liquid": "liquid-scss",
-    "cstdint": "cpp",
+    "cmath": "cpp",
     "array": "cpp",
     "atomic": "cpp",
     "bit": "cpp",
     "cctype": "cpp",
     "charconv": "cpp",
     "clocale": "cpp",
-    "cmath": "cpp",
     "cstdarg": "cpp",
     "cstddef": "cpp",
+    "cstdint": "cpp",
     "cstdio": "cpp",
     "cstdlib": "cpp",
     "ctime": "cpp",
@@ -104,5 +100,5 @@
     "stop_token": "cpp",
     "text_encoding": "cpp",
     "thread": "cpp"
-  }
+  },
 }

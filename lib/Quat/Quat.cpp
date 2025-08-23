@@ -12,19 +12,19 @@ namespace ori {
 
 // Euler angles from quaternions
 [[nodiscard]] Vect Quat::to_euler() const {
-  const float x1 = (2.0F * i_ * j_) - (2.0F * w_ * k_);
-  const float x2 = (2.0F * w_ * w_) + (2.0F * i_ * i_) - 1.0F;
+  const float x1 = (2.0F * j_ * k_) - (2.0F * w_ * i_);
+  const float x2 = (2.0F * w_ * w_) + (2.0F * k_ * k_) - 1.0F;
   const float x_ypr = atan2(x1, x2);
 
   const float y_val = (2.0F * i_ * k_) + (2.0F * w_ * j_);
   const float clamped_y_val = std::clamp(y_val, -1.0F, 1.0F);
   const float y_ypr = -asin(clamped_y_val);
 
-  const float z1 = (2.0F * j_ * k_) - (2.0F * w_ * i_);
-  const float z2 = (2.0F * w_ * w_) + (2.0F * k_ * k_) - 1.0F;
+  const float z1 = (2.0F * i_ * j_) - (2.0F * w_ * k_);
+  const float z2 = (2.0F * w_ * w_) + (2.0F * i_ * i_) - 1.0F;
   const float z_ypr = atan2(z1, z2);
 
-  return Vect(x_ypr, y_ypr, z_ypr);
+  return Vect(-x_ypr, -y_ypr, -z_ypr);
 }
 
 [[nodiscard]] Vect Vect::to_radians() const {

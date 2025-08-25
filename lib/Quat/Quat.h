@@ -19,6 +19,7 @@ class Vect {
  public:
   constexpr Vect() = default;
   constexpr Vect(float x, float y, float z) : x_(x), y_(y), z_(z) {}
+
   [[nodiscard]] float x() const { return x_; }
   [[nodiscard]] float y() const { return y_; }
   [[nodiscard]] float z() const { return z_; }
@@ -32,6 +33,9 @@ class Vect {
 
   // Convert from radians to degrees
   [[nodiscard]] Vect to_degrees() const;
+
+  // Calculate magnitude of vector
+  [[nodiscard]] float mag() const;
 };
 
 class Quat {
@@ -69,6 +73,10 @@ class Quat {
   [[nodiscard]] Quat operator+(float f) const { return Quat(w_ + f, i_ + f, j_ + f, k_ + f); }
 
   [[nodiscard]] Quat operator-(float f) const { return Quat(w_ - f, i_ - f, j_ - f, k_ - f); }
+
+  [[nodiscard]] Quat conjugate() const;
+
+  [[nodiscard]] Quat normalise() const;
 
   // Quaternions from angular rate using madgwick paper
   [[nodiscard]] Quat update(Vect& v, float dt) const;

@@ -15,22 +15,27 @@ class pid {
 
   float _integral{};
   float _setpoint{};
-  float _prev_error{};
+  float _prev_state{};
 
   const float _anti_wind_lim;
 
  public:
-  explicit pid(float kp, float kd, float ki, float setpoint = 0, float anti_wind_lim = 0);
+  explicit pid(float kp, float ki, float kd, float setpoint = 0, float anti_wind_lim = 0);
 
   [[nodiscard]] auto kp() const -> float { return _kp; }
   [[nodiscard]] auto ki() const -> float { return _ki; }
   [[nodiscard]] auto kd() const -> float { return _kd; }
 
-  [[nodiscard]] auto prev_error() const -> float { return _prev_error; }
+  [[nodiscard]] auto prev_error() const -> float { return _prev_state; }
   [[nodiscard]] auto integral() const -> float { return _integral; }
   [[nodiscard]] auto setpoint() const -> float { return _setpoint; }
 
   auto set_setpoint(float setpoint) -> void { _setpoint = setpoint; }
+
+  //
+  // Set all internal states back to 0
+  //
+  auto reset() -> void;
 
   //
   // Update the PID loop to get the control variable result

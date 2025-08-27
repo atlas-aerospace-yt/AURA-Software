@@ -1,39 +1,65 @@
 #include "Flash.h"
 
-void flash::flash::mount_fat_partition()
-{
-    const esp_partition_t* fat_partition;
-    ESP_ERROR_CHECK(esp_partition_register_external(
-        _ext_flash,
-        OFFSET,
-        _ext_flash->size,
-        _partition_label,
-        ESP_PARTITION_TYPE_DATA,
-        ESP_PARTITION_SUBTYPE_DATA_FAT,
-        &fat_partition
-    ));
+namespace flash {
 
-    esp_vfs_fat_mount_config_t mount_config = {};
-    mount_config.format_if_mount_failed = false;
-    mount_config.max_files = MAX_FILES_OPEN;
-    mount_config.allocation_unit_size = CONFIG_WL_SECTOR_SIZE;
-    mount_config.use_one_fat = false;
+flash::flash(gpio_num_t flash_cs) : _flash_cs(flash_cs) {
+  uint32_t id;
 
-    ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl(
-        FLASH_DIR,
-        _partition_label,
-        &mount_config,
-        &_s_wl_handle
-    ));
+  _flash_config.host_id = SPI_BUS;
+  _flash_config.cs_io_num = _flash_cs;
+  _flash_config.io_mode = SPI_FLASH_DIO;
+  _flash_config.freq_mhz = FREQ_MHZ;
 
-    ESP_LOGI(FLASH_TAG, "Mounted FAT partition on external flash.");
+  ESP_ERROR_CHECK(spi_bus_add_flash_device(&_ext_flash, &_flash_config));
+  ESP_ERROR_CHECK(esp_flash_init(_ext_flash));
+  ESP_ERROR_CHECK(esp_flash_read_id(_ext_flash, &id));
+
+  ESP_LOGI(FLASH_TAG, "Initialized external Flash, size=%ld KB, ID=0x%ld", _ext_flash->size / 1024,
+           id);
 }
 
-void flash::flash::unmount_fat_partition()
-{
-    ESP_ERROR_CHECK(esp_vfs_fat_spiflash_unmount_rw_wl(
-        FLASH_DIR, _s_wl_handle
-    ));
+auto flash::force_mount_fat_partition() -> void {
+  const esp_partition_t* fat_partition;
+  ESP_ERROR_CHECK(esp_partition_register_external(_ext_flash, OFFSET, _ext_flash->size,
+                                                  PARTITION_LABEL, ESP_PARTITION_TYPE_DATA,
+                                                  ESP_PARTITION_SUBTYPE_DATA_FAT, &fat_partition));
 
-    ESP_LOGI(FLASH_TAG, "Unmounted FAT partition on external flash.");
+  ESP_ERROR_CHECK(esp_partition_erase_range(fat_partition, OFFSET, _ext_flash->size));
+
+  esp_vfs_fat_mount_config_t mount_config = {};
+  mount_config.format_if_mount_failed = true;  // This may erase data
+  mount_config.max_files = MAX_FILES_OPEN;
+  mount_config.allocation_unit_size = CONFIG_WL_SECTOR_SIZE;
+  mount_config.use_one_fat = false;
+
+  ESP_ERROR_CHECK(
+      esp_vfs_fat_spiflash_mount_rw_wl(FLASH_DIR, PARTITION_LABEL, &mount_config, &_s_wl_handle));
+
+  ESP_LOGI(FLASH_TAG, "Erased flash and mounted FAT partition on external flash.");
 }
+
+auto flash::mount_fat_partition() -> void {
+  const esp_partition_t* fat_partition;
+  ESP_ERROR_CHECK(esp_partition_register_external(_ext_flash, OFFSET, _ext_flash->size,
+                                                  PARTITION_LABEL, ESP_PARTITION_TYPE_DATA,
+                                                  ESP_PARTITION_SUBTYPE_DATA_FAT, &fat_partition));
+
+  esp_vfs_fat_mount_config_t mount_config = {};
+  mount_config.format_if_mount_failed = false;
+  mount_config.max_files = MAX_FILES_OPEN;
+  mount_config.allocation_unit_size = CONFIG_WL_SECTOR_SIZE;
+  mount_config.use_one_fat = false;
+
+  ESP_ERROR_CHECK(
+      esp_vfs_fat_spiflash_mount_rw_wl(FLASH_DIR, PARTITION_LABEL, &mount_config, &_s_wl_handle));
+
+  ESP_LOGI(FLASH_TAG, "Mounted FAT partition on external flash.");
+}
+
+auto flash::unmount_fat_partition() -> void {
+  ESP_ERROR_CHECK(esp_vfs_fat_spiflash_unmount_rw_wl(FLASH_DIR, _s_wl_handle));
+
+  ESP_LOGI(FLASH_TAG, "Unmounted FAT partition on external flash.");
+}
+
+}  // namespace flash

@@ -116,9 +116,9 @@ class i2c_bus final {
 
     for (int i = 0; i < N; ++i) {
       T shift = (N - 1 - i) * BYTE_LEN;
-      if (lil_end && i % 2 == 0) {
+      if (N > 1 && lil_end && i % 2 == 0) {
         output |= static_cast<T>(data[i + 1]) << shift;
-      } else if (lil_end) {
+      } else if (N > 1 && lil_end) {
         output |= static_cast<T>(data[i - 1]) << shift;
       } else {
         output |= static_cast<T>(data[i]) << shift;

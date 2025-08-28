@@ -9,9 +9,9 @@
 
 namespace flash {
 
-constexpr char* FLASH_TAG = "flash";
-constexpr char* FLASH_DIR = "/ext_flash";
-constexpr char* PARTITION_LABEL = "storage";
+constexpr const char* FLASH_TAG = "flash";
+constexpr const char* FLASH_DIR = "/ext_flash";
+constexpr const char* PARTITION_LABEL = "storage";
 
 constexpr uint8_t MAX_FILES_OPEN = 5;
 constexpr uint8_t FREQ_MHZ = 40;

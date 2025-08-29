@@ -1,7 +1,6 @@
 {
   "editor.formatOnType": true,
   "editor.formatOnSave": true,
-  // ESP-IDF settings
   "idf.flashType": "DFU",
   "idf.portWin": "COM3",
   "idf.openOcdConfigs": [
@@ -10,20 +9,17 @@
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32s3"
   },
-  // C++ include paths
   "C_Cpp.default.includePath": [
     "${workspaceFolder}/**",
     "${env:IDF_PATH}/components/**",
-    "${env:IDF_TOOLS_PATH}/tools/**",
+    "${env:IDF_TOOLS_PATH}/tools/**"
   ],
   "C_Cpp.clang_format_style": "file",
   "C_Cpp.default.cppStandard": "c++23",
   "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
-  // clang-tidy integration
   "C_Cpp.codeAnalysis.runAutomatically": true,
   "C_Cpp.codeAnalysis.clangTidy.enabled": true,
   "C_Cpp.codeAnalysis.clangTidy.useBuildPath": true,
-  // No overriding of .clang-tidy rules here unless intentional
   "C_Cpp.codeAnalysis.clangTidy.args": [
     "-I${env:IDF_TOOLS_PATH}**"
   ],
@@ -101,4 +97,13 @@
     "text_encoding": "cpp",
     "thread": "cpp"
   },
+  "clangd.path": "C:\\Users\\Alexander_Armitage\\.espressif\\tools\\esp-clang\\esp-19.1.2_20250312\\esp-clang\\bin\\clangd.exe",
+  "clangd.arguments": [
+    "--background-index",
+    "--query-driver=C:\\Users\\Alexander_Armitage\\.espressif\\tools\\xtensa-esp-elf\\esp-14.2.0_20241119\\xtensa-esp-elf\\bin\\xtensa-esp32s3-elf-gcc.exe",
+    "--compile-commands-dir=c:\\Users\\Alexander_Armitage\\Documents\\GitHub\\AURA-Software\\build"
+  ],
+  "idf.espIdfPathWin": "C:\\Users\\Alexander_Armitage\\esp\\v5.5\\esp-idf",
+  "idf.toolsPathWin": "C:\\Users\\Alexander_Armitage\\.espressif",
+  "idf.pythonInstallPath": "C:\\Users\\Alexander_Armitage\\.espressif\\tools\\idf-python\\3.11.2\\python.exe"
 }

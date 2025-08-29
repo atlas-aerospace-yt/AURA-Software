@@ -17,19 +17,6 @@ receiver::receiver(gpio_num_t rx_pin, uart_port_t uart_port) : _uart_port(uart_p
   ESP_ERROR_CHECK(uart_set_pin(_uart_port, -1, rx_pin, -1, -1));
 }
 
-[[nodiscard]] auto receiver::_get_frame_start() const -> int16_t {
-  // Calculate the last possible start point for a complete frame
-  const uint8_t last_frame_start_pos = _data_len - 33;
-  // Iterate backwards until 0x20 and 0x40 are found
-  for (int16_t i = last_frame_start_pos; i >= 0; i--) {
-    if (_data[i] == IBUS_START_1 && _data[i + 1] == IBUS_START_2) {
-      return i;
-    }
-  }
-  // If no frame start is found
-  return -1;
-}
-
 auto receiver::_parse_ch_vals(uint8_t frame_start) -> void {
   _ch1 = _data[frame_start + 2] | _data[frame_start + 3] << 8;
   _ch2 = _data[frame_start + 4] | _data[frame_start + 5] << 8;
@@ -40,11 +27,12 @@ auto receiver::_parse_ch_vals(uint8_t frame_start) -> void {
 }
 
 auto receiver::update() -> void {
+  // Read UART buffer
   _data_len = static_cast<int16_t>(uart_read_bytes(_uart_port, &_data, sizeof(_data), TIMEOUT));
-  const int16_t indx = _get_frame_start();
-  // Check if there is a data frame
-  if (indx != -1) {
-    _parse_ch_vals(static_cast<uint8_t>(indx));
+
+  // Check if there is data to process, then process it
+  if (_data_len != 0) {
+    _parse_ch_vals(0);
   }
 }
 

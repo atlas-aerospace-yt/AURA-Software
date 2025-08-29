@@ -32,13 +32,6 @@ class receiver {
   uint16_t _ch6{};
 
   //
-  // Get the index of the 0x20 from the start bytes of the iBus protocol
-  //
-  // @returns int16_t -1 to BUFFER_SIZE where -1 is only if the start is not found
-  //
-  [[nodiscard]] auto _get_frame_start() const -> int16_t;
-
-  //
   // Convert the data in the buffer into useable values (1000-2000) which are saved in the _ch*
   // variables
   //

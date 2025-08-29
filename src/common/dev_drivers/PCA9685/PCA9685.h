@@ -20,7 +20,7 @@ constexpr uint8_t MAX_CH_NUM = 15;
 
 constexpr uint8_t REG_ADDR_SEP_CNT = 0x04;
 
-constexpr uint32_t I2C_SPEED = 1200000;
+constexpr uint32_t I2C_SPEED = 1000000;
 
 constexpr uint8_t ESC_FREQ = 50;
 constexpr uint8_t ESC_OFF = 0;

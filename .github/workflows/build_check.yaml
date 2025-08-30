@@ -1,4 +1,4 @@
-name: Build and clang-tidy check
+name: Build check
 
 on:
   pull_request:

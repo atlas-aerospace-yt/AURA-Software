@@ -8,6 +8,9 @@
 #include "math.h"
 
 namespace ori {
+class Quat;
+class Vect;
+
 constexpr float PI = 3.14159F;
 constexpr float deg_to_rad = PI / 180.0F;
 constexpr float rad_to_deg = 180.0F / PI;
@@ -24,9 +27,13 @@ class Vect {
   [[nodiscard]] float y() const { return y_; }
   [[nodiscard]] float z() const { return z_; }
 
-  [[nodiscard]] Vect operator/(float f) const { return Vect(x_ / f, y_ / f, z_ / f); }
+  [[nodiscard]] Vect operator/(float f) const {
+    return Vect(x_ / f, y_ / f, z_ / f);
+  }
 
-  [[nodiscard]] Vect operator*(float f) const { return Vect(x_ * f, y_ * f, z_ * f); }
+  [[nodiscard]] Vect operator*(float f) const {
+    return Vect(x_ * f, y_ * f, z_ * f);
+  }
 
   // Convert from degrees to radians
   [[nodiscard]] Vect to_radians() const;
@@ -36,6 +43,9 @@ class Vect {
 
   // Calculate magnitude of vector
   [[nodiscard]] float mag() const;
+
+  // Calculate quaternion from euler
+  [[nodiscard]] Quat to_quat() const;
 };
 
 class Quat {
@@ -44,14 +54,17 @@ class Quat {
 
  public:
   constexpr Quat() = default;
-  constexpr Quat(float w, float i, float j, float k) : w_(w), i_(i), j_(j), k_(k) {}
+  constexpr Quat(float w, float i, float j, float k)
+      : w_(w), i_(i), j_(j), k_(k) {}
 
   [[nodiscard]] float w() const { return w_; }
   [[nodiscard]] float i() const { return i_; }
   [[nodiscard]] float j() const { return j_; }
   [[nodiscard]] float k() const { return k_; }
 
-  [[nodiscard]] Quat operator/(float f) const { return Quat(w_ / f, i_ / f, j_ / f, k_ / f); }
+  [[nodiscard]] Quat operator/(float f) const {
+    return Quat(w_ / f, i_ / f, j_ / f, k_ / f);
+  }
 
   [[nodiscard]] Quat operator*(const Quat& q) const {
     return Quat((w_ * q.w()) - (i_ * q.i()) - (j_ * q.j()) - (k_ * q.k()),
@@ -60,7 +73,9 @@ class Quat {
                 (w_ * q.k()) + (i_ * q.j()) - (j_ * q.i()) + (k_ * q.w()));
   }
 
-  [[nodiscard]] Quat operator*(float f) const { return Quat(w_ * f, i_ * f, j_ * f, k_ * f); }
+  [[nodiscard]] Quat operator*(float f) const {
+    return Quat(w_ * f, i_ * f, j_ * f, k_ * f);
+  }
 
   [[nodiscard]] Quat operator+(const Quat& q) const {
     return Quat(w_ + q.w(), i_ + q.i(), j_ + q.j(), k_ + q.k());
@@ -70,9 +85,13 @@ class Quat {
     return Quat(w_ - q.w(), i_ - q.i(), j_ - q.j(), k_ - q.k());
   }
 
-  [[nodiscard]] Quat operator+(float f) const { return Quat(w_ + f, i_ + f, j_ + f, k_ + f); }
+  [[nodiscard]] Quat operator+(float f) const {
+    return Quat(w_ + f, i_ + f, j_ + f, k_ + f);
+  }
 
-  [[nodiscard]] Quat operator-(float f) const { return Quat(w_ - f, i_ - f, j_ - f, k_ - f); }
+  [[nodiscard]] Quat operator-(float f) const {
+    return Quat(w_ - f, i_ - f, j_ - f, k_ - f);
+  }
 
   [[nodiscard]] Quat conjugate() const;
 

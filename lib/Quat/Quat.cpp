@@ -22,6 +22,18 @@ namespace ori {
   return Vect(x_ * rad_to_deg, y_ * rad_to_deg, z_ * rad_to_deg);
 }
 
+[[nodiscard]] Quat Vect::to_quat() const {
+  const float cr = cosf(x_ * 0.5f);
+  const float sr = sinf(x_ * 0.5f);
+  const float cp = cosf(y_ * 0.5f);
+  const float sp = sinf(y_ * 0.5f);
+  const float cy = cosf(z_ * 0.5f);
+  const float sy = sinf(z_ * 0.5f);
+
+  return Quat(cr * cp * cy - sr * sp * sy, sr * cp * cy + cr * sp * sy,
+              cr * sp * cy - sr * cp * sy, cr * cp * sy + sr * sp * cy);
+}
+
 // Euler angles from quaternions
 [[nodiscard]] Vect Quat::to_euler() const {
   const float x1 = (2.0F * j_ * k_) - (2.0F * w_ * i_);
@@ -45,9 +57,7 @@ namespace ori {
   return *this + (q_dot * dt);
 }
 
-[[nodiscard]] Quat Quat::conjugate() const {
-  return Quat(w_, -i_, -j_, -k_);
-}
+[[nodiscard]] Quat Quat::conjugate() const { return Quat(w_, -i_, -j_, -k_); }
 
 [[nodiscard]] Quat Quat::normalise() const {
   const float mag = sqrtf((w_ * w_) + (i_ * i_) + (j_ * j_) + (k_ * k_));

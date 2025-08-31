@@ -19,8 +19,11 @@ class pid {
 
   const float _anti_wind_lim;
 
+  bool _enabled_integral;
+
  public:
-  explicit pid(float kp, float ki, float kd, float setpoint = 0, float anti_wind_lim = 0);
+  explicit pid(float kp, float ki, float kd, float setpoint = 0,
+               float anti_wind_lim = 0);
 
   [[nodiscard]] auto kp() const -> float { return _kp; }
   [[nodiscard]] auto ki() const -> float { return _ki; }
@@ -46,6 +49,13 @@ class pid {
   // @returns float the control variable calculated by the controller
   //
   [[nodiscard]] auto update(float state, float dt) -> float;
+
+  //
+  // Enable or disable the integral to stop windup (also resets the integral)
+  //
+  // True is enabled, False is disabled
+  //
+  auto enable_disable_interal(bool enabled) -> void;
 };
 
 }  // namespace pid

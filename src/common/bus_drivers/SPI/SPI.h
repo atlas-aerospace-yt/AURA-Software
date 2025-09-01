@@ -1,11 +1,9 @@
 #pragma once
 
-#include "driver/spi_common.h"
 #include "driver/gpio.h"
+#include "driver/spi_common.h"
 
-#define SPI_BUS SPI2_HOST
-
-namespace spi
-{
-    void create_spi_bus(void);
+namespace spi {
+void create_spi_bus(spi_host_device_t spi_bus, gpio_num_t mosi, gpio_num_t miso,
+                    gpio_num_t sck);
 }

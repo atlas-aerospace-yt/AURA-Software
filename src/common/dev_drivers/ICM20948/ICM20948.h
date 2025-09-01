@@ -102,7 +102,8 @@ constexpr float CONVERT_MAG = 0.15F;
 constexpr float MAG_Z_OFFS = 45.0F;
 
 //
-// A wrapper class to handle communication with an ICM20948 device connected via the I2c protocol
+// A wrapper class to handle communication with an ICM20948 device connected via
+// the I2c protocol
 //
 class icm20948 {
  private:
@@ -133,32 +134,35 @@ class icm20948 {
   void _wake_device();
 
   //
-  // Set the gyroscope configuration to +-2000deg/s and configure the lowpass filter to a cuttoff
-  // frequency of 5Hz
+  // Set the gyroscope configuration to +-2000deg/s and configure the lowpass
+  // filter to a cuttoff frequency of 5Hz
   //
   void _configure_gyro();
 
   //
-  // Set the accelerometer configuration to +-16g and configure the lowpass filter to a cuttoff
-  // frequency of 5Hz
+  // Set the accelerometer configuration to +-16g and configure the lowpass
+  // filter to a cuttoff frequency of 5Hz
   //
   void _configure_accel();
 
   //
-  // The AK0991 is on a seperate I2C bus controlled by the ICM20948 so this makes the AK09916 show
-  // up on the same bus the ICM20948 is on
+  // The AK0991 is on a seperate I2C bus controlled by the ICM20948 so this
+  // makes the AK09916 show up on the same bus the ICM20948 is on
   //
   void _set_i2c_bypass();
 
   //
-  // Configure the magnetometer to wake the device up and set it to read data continuously
+  // Configure the magnetometer to wake the device up and set it to read data
+  // continuously
   //
   void _configure_mag();
 
   //
-  // A convinience function which selects which register bank you are reading/writing to
+  // A convinience function which selects which register bank you are
+  // reading/writing to
   //
-  // NOTE: you must select bank 0 with BANK_SEL_0 after changing as the ICM20948 does not
+  // NOTE: you must select bank 0 with BANK_SEL_0 after changing as the ICM20948
+  // does not
   //       automatically deselect the chosen bank
   //
   void _select_register(uint8_t reg);
@@ -179,8 +183,8 @@ class icm20948 {
   [[nodiscard]] auto mag_z() const -> float { return _mag_z; }
 
   //
-  // Read the accelerometer readings in one go and then the gyro readings in one go and convert to
-  // a float
+  // Read the accelerometer readings in one go and then the gyro readings in one
+  // go and convert to a float
   //
   auto update() -> void;
 

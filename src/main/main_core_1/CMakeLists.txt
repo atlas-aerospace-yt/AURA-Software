@@ -4,4 +4,5 @@ idf_component_register(SRCS ./main_core_1.cpp
                             Flash
                             SD_Card
                             utility
+                            fatfs
 )

@@ -7,4 +7,6 @@ idf_component_register(SRCS ./main_core_0.cpp
                             INA219
                             Quat
                             FSA8S
+                            PCA9685
+                            PID
 )

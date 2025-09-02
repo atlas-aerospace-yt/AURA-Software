@@ -63,4 +63,39 @@ namespace ori {
   const float mag = sqrtf((w_ * w_) + (i_ * i_) + (j_ * j_) + (k_ * k_));
   return Quat(w_ / mag, i_ / mag, j_ / mag, k_ / mag);
 }
+
+[[nodiscard]] Vect Quat::calc_error_axis(Quat desired) const {
+  const Quat err_quat = desired * this->conjugate();
+
+  if (err_quat.w() < 0.0F) {
+    return Vect(-err_quat.i(), -err_quat.j(), -err_quat.k());
+  }
+  return Vect(err_quat.i(), err_quat.j(), err_quat.k());
+}
+
+// This function is slower than calc_error_axes only use if exact
+// angles are required
+[[nodiscard]] Vect Quat::calc_error(Quat desired) const {
+  const Quat err_quat = desired * this->conjugate();
+
+  // Ensure shortest path is followed
+  Vect error_axes{};
+  if (err_quat.w() < 0.0F) {
+    error_axes = Vect(-err_quat.i(), -err_quat.j(), -err_quat.k());
+  } else {
+    error_axes = Vect(err_quat.i(), err_quat.j(), err_quat.k());
+  }
+
+  const float magnitude = error_axes.mag();
+
+  // Avoid errors near 0
+  if (magnitude < 1e-6f) {
+    return Vect(0.0f, 0.0f, 0.0f);
+  }
+
+  const float angle = 2.0f * std::atan2(magnitude, err_quat.w());
+
+  return error_axes * (angle / magnitude);
+}
+
 }  // namespace ori

@@ -99,7 +99,26 @@ class Quat {
 
   // Quaternions from angular rate using madgwick paper
   [[nodiscard]] Quat update(Vect& v, float dt) const;
+
+  // Calculate the equivalent euler angles
   [[nodiscard]] Vect to_euler() const;
+
+  //
+  // Calculate the rotation error axes (x y z)
+  //
+  // @param desired the desired quaternion rotation
+  //
+  [[nodiscard]] Vect calc_error_axis(Quat desired) const;
+
+  //
+  // Calculate the rotation error (x y z)
+  //
+  // This function is slower than calc_error_axes only use if exact
+  // angles are required
+  //
+  // @param desired the desired quaternion rotation
+  //
+  [[nodiscard]] Vect calc_error(Quat desired) const;
 };
 
 }  // namespace ori

@@ -24,20 +24,26 @@ icm20948::icm20948(i2c::i2c_bus* master_bus) : _master_bus(master_bus) {
 }
 
 void icm20948::_wake_device() {
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_PWR_MGMT_1, PWR_MGMT_1));
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_PWR_MGMT_2, PWR_MGMT_2));
+  ESP_ERROR_CHECK(
+      _master_bus->write_byte_i2c(_icm_handle, ICM_PWR_MGMT_1, PWR_MGMT_1));
+  ESP_ERROR_CHECK(
+      _master_bus->write_byte_i2c(_icm_handle, ICM_PWR_MGMT_2, PWR_MGMT_2));
 }
 
 void icm20948::_select_register(uint8_t reg) {
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_REG_BANK_SEL, reg));
+  ESP_ERROR_CHECK(
+      _master_bus->write_byte_i2c(_icm_handle, ICM_REG_BANK_SEL, reg));
 }
 
 void icm20948::_configure_gyro() {
   _select_register(BANK_SEL_2);
 
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_GYRO_SMPLRT_DIV, GYRO_SMPLRT_DIV));
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_GYRO_CONFIG_1, GYRO_CONFIG_1));
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_GYRO_CONFIG_2, GYRO_CONFIG_2));
+  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_GYRO_SMPLRT_DIV,
+                                              GYRO_SMPLRT_DIV));
+  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_GYRO_CONFIG_1,
+                                              GYRO_CONFIG_1));
+  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_GYRO_CONFIG_2,
+                                              GYRO_CONFIG_2));
 
   _select_register(BANK_SEL_0);
 }
@@ -45,42 +51,60 @@ void icm20948::_configure_gyro() {
 void icm20948::_configure_accel() {
   _select_register(BANK_SEL_2);
 
-  ESP_ERROR_CHECK(
-      _master_bus->write_byte_i2c(_icm_handle, ICM_ACCEL_SMPLRT_DIV_1, ACCEL_SMPLRT_DIV));
-  ESP_ERROR_CHECK(
-      _master_bus->write_byte_i2c(_icm_handle, ICM_ACCEL_SMPLRT_DIV_2, ACCEL_SMPLRT_DIV));
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_ACCEL_CONFIG_1, ACCEL_CONFIG_1));
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_ACCEL_CONFIG_2, ACCEL_CONFIG_2));
+  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(
+      _icm_handle, ICM_ACCEL_SMPLRT_DIV_1, ACCEL_SMPLRT_DIV));
+  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(
+      _icm_handle, ICM_ACCEL_SMPLRT_DIV_2, ACCEL_SMPLRT_DIV));
+  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_ACCEL_CONFIG_1,
+                                              ACCEL_CONFIG_1));
+  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_ACCEL_CONFIG_2,
+                                              ACCEL_CONFIG_2));
 
   _select_register(BANK_SEL_0);
 }
 
 void icm20948::_set_i2c_bypass() {
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_icm_handle, ICM_INT_PIN_CFG, INT_PIN_CFG));
+  ESP_ERROR_CHECK(
+      _master_bus->write_byte_i2c(_icm_handle, ICM_INT_PIN_CFG, INT_PIN_CFG));
 }
 
 void icm20948::_configure_mag() {
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_mag_handle, MAG_CNTRL_2, MAG_SLEEP));
+  ESP_ERROR_CHECK(
+      _master_bus->write_byte_i2c(_mag_handle, MAG_CNTRL_2, MAG_SLEEP));
 
   vTaskDelay(pdMS_TO_TICKS(10));
 
-  ESP_ERROR_CHECK(_master_bus->write_byte_i2c(_mag_handle, MAG_CNTRL_2, MAG_CONT_MODE_4));
+  ESP_ERROR_CHECK(
+      _master_bus->write_byte_i2c(_mag_handle, MAG_CNTRL_2, MAG_CONT_MODE_4));
 
   vTaskDelay(pdMS_TO_TICKS(10));
 }
 
 // NOLINTBEGIN(misc-magic-numbers, readability-magic-numbers)
 void icm20948::update() {
-  const uint64_t acc = _master_bus->read_bytes_i2c<uint64_t, 6>(_icm_handle, ICM_ACC_XOUT);
-  const uint64_t gyro = _master_bus->read_bytes_i2c<uint64_t, 6>(_icm_handle, ICM_GYRO_XOUT);
+  const uint64_t acc =
+      _master_bus->read_bytes_i2c<uint64_t, 6>(_icm_handle, ICM_ACC_XOUT);
+  const uint64_t gyro =
+      _master_bus->read_bytes_i2c<uint64_t, 6>(_icm_handle, ICM_GYRO_XOUT);
 
-  _acc_x = static_cast<float>(static_cast<int16_t>((acc >> 32) & AXIS_MASK)) / CONVERT_ACCEL;
-  _acc_y = static_cast<float>(static_cast<int16_t>((acc >> 16) & AXIS_MASK)) / CONVERT_ACCEL;
-  _acc_z = static_cast<float>(static_cast<int16_t>((acc >> 0) & AXIS_MASK)) / CONVERT_ACCEL;
+  _acc_x = static_cast<float>(static_cast<int16_t>((acc >> 32) & AXIS_MASK)) /
+           CONVERT_ACCEL;
+  _acc_y = static_cast<float>(static_cast<int16_t>((acc >> 16) & AXIS_MASK)) /
+           CONVERT_ACCEL;
+  _acc_z = static_cast<float>(static_cast<int16_t>((acc >> 0) & AXIS_MASK)) /
+           CONVERT_ACCEL;
 
-  _gyro_x = static_cast<float>(static_cast<int16_t>((gyro >> 32) & AXIS_MASK)) / CONVERT_GYRO;
-  _gyro_y = static_cast<float>(static_cast<int16_t>((gyro >> 16) & AXIS_MASK)) / CONVERT_GYRO;
-  _gyro_z = static_cast<float>(static_cast<int16_t>((gyro >> 0) & AXIS_MASK)) / CONVERT_GYRO;
+  _gyro_x =
+      (static_cast<float>(static_cast<int16_t>((gyro >> 32) & AXIS_MASK)) /
+       CONVERT_GYRO) -
+      _x_offs;
+  _gyro_y =
+      (static_cast<float>(static_cast<int16_t>((gyro >> 16) & AXIS_MASK)) /
+       CONVERT_GYRO) -
+      _y_offs;
+  _gyro_z = (static_cast<float>(static_cast<int16_t>((gyro >> 0) & AXIS_MASK)) /
+             CONVERT_GYRO) -
+            _z_offs;
 }
 
 //
@@ -89,13 +113,44 @@ void icm20948::update() {
 void icm20948::update_mag() {
   _master_bus->read_bytes_i2c<uint8_t, 1>(_mag_handle, MAG_ST1);
 
-  const uint64_t mag = _master_bus->read_bytes_i2c<uint64_t, 6>(_mag_handle, MAG_HXL, true);
+  const uint64_t mag =
+      _master_bus->read_bytes_i2c<uint64_t, 6>(_mag_handle, MAG_HXL, true);
 
   _master_bus->read_bytes_i2c<uint8_t, 1>(_mag_handle, MAG_ST2);
 
-  _mag_x = static_cast<float>(static_cast<int16_t>((mag >> 32) & AXIS_MASK)) * CONVERT_MAG;
-  _mag_y = static_cast<float>(static_cast<int16_t>((mag >> 16) & AXIS_MASK)) * CONVERT_MAG;
-  _mag_z = static_cast<float>(static_cast<int16_t>(mag & AXIS_MASK)) * CONVERT_MAG - MAG_Z_OFFS;
+  _mag_x = static_cast<float>(static_cast<int16_t>((mag >> 32) & AXIS_MASK)) *
+           CONVERT_MAG;
+  _mag_y = static_cast<float>(static_cast<int16_t>((mag >> 16) & AXIS_MASK)) *
+           CONVERT_MAG;
+  _mag_z =
+      static_cast<float>(static_cast<int16_t>(mag & AXIS_MASK)) * CONVERT_MAG -
+      MAG_Z_OFFS;
 }
 // NOLINTEND(misc-magic-numbers, readability-magic-numbers)
+
+auto icm20948::calibrate_gyro(uint16_t n_samples) -> void {
+  // Clear current offset
+  _x_offs = 0.0F;
+  _y_offs = 0.0F;
+  _z_offs = 0.0F;
+
+  // Sum the next n samples
+  float tmp_x_offs{};
+  float tmp_y_offs{};
+  float tmp_z_offs{};
+
+  for (uint16_t i = 0; i < n_samples; i++) {
+    this->update();
+    tmp_x_offs += this->gyro_x();
+    tmp_y_offs += this->gyro_y();
+    tmp_z_offs += this->gyro_z();
+    vTaskDelay(pdMS_TO_TICKS(3));
+  }
+
+  // Set the offset
+  _x_offs = tmp_x_offs / static_cast<float>(n_samples);
+  _y_offs = tmp_y_offs / static_cast<float>(n_samples);
+  _z_offs = tmp_z_offs / static_cast<float>(n_samples);
+}
+
 }  // namespace icm20948

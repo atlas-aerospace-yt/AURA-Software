@@ -128,6 +128,11 @@ class icm20948 {
   float _mag_y{};
   float _mag_z{};
 
+  // Offset definitions
+  float _x_offs{};
+  float _y_offs{};
+  float _z_offs{};
+
   //
   // Write to PWR_MGMT_1 and PWR_MGMT_2 to turn on accelerometer and gyroscope
   //
@@ -195,6 +200,15 @@ class icm20948 {
   // 3 - Read ST2 to check if overflow occured
   //
   auto update_mag() -> void;
+
+  //
+  // Average N samples to calculate the offsets for the gyro
+  //
+  // The device must be completely still during this process
+  //
+  // @param n_samples the number of samples to take
+  //
+  auto calibrate_gyro(uint16_t n_samples) -> void;
 };
 
 }  // namespace icm20948

@@ -14,6 +14,11 @@ namespace ori {
   return sqrtf((x_ * x_) + (y_ * y_) + (z_ * z_));
 }
 
+[[nodiscard]] Vect Vect::normalise() const {
+  const float mag = this->mag();
+  return *this / mag;
+}
+
 [[nodiscard]] Vect Vect::to_radians() const {
   return Vect(x_ * deg_to_rad, y_ * deg_to_rad, z_ * deg_to_rad);
 }
@@ -32,6 +37,27 @@ namespace ori {
 
   return Quat(cr * cp * cy - sr * sp * sy, sr * cp * cy + cr * sp * sy,
               cr * sp * cy - sr * cp * sy, cr * cp * sy + sr * sp * cy);
+}
+
+[[nodiscard]] float Vect::dot(Vect a, Vect b) {
+  return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
+}
+
+[[nodiscard]] Vect Vect::cross(Vect a, Vect b) {
+  return Vect(a.y() * b.z() - a.z() * b.y(), a.z() * b.x() - a.x() * b.z(),
+              a.x() * b.y() - a.y() * b.x());
+}
+
+[[nodiscard]] Quat Vect::quat_from_two_vect(Vect a, Vect b) {
+  Vect cross = Vect::cross(a, b);
+  float w = sqrtf(1.0F + Vect::dot(a, b));
+  if (w < 1e-6f) {
+    cross = Vect::cross(
+        fabs(a.x()) < 0.9F ? Vect(1.0F, 0.0F, 0.0F) : Vect(0.0F, 1.0F, 0.0F),
+        a);
+    w = 0.0F;
+  }
+  return Quat(w, cross.x(), cross.y(), cross.z()).normalise();
 }
 
 // Euler angles from quaternions
@@ -59,17 +85,18 @@ namespace ori {
 
 [[nodiscard]] Quat Quat::conjugate() const { return Quat(w_, -i_, -j_, -k_); }
 
+[[nodiscard]] float Quat::mag() const {
+  return sqrtf((w_ * w_) + (i_ * i_) + (j_ * j_) + (k_ * k_));
+}
+
 [[nodiscard]] Quat Quat::normalise() const {
-  const float mag = sqrtf((w_ * w_) + (i_ * i_) + (j_ * j_) + (k_ * k_));
-  return Quat(w_ / mag, i_ / mag, j_ / mag, k_ / mag);
+  const float mag = this->mag();
+  return *this / mag;
 }
 
 [[nodiscard]] Vect Quat::calc_error_axis(Quat desired) const {
   const Quat err_quat = desired * this->conjugate();
 
-  if (err_quat.w() < 0.0F) {
-    return Vect(-err_quat.i(), -err_quat.j(), -err_quat.k());
-  }
   return Vect(err_quat.i(), err_quat.j(), err_quat.k());
 }
 

@@ -35,6 +35,14 @@ class Vect {
     return Vect(x_ * f, y_ * f, z_ * f);
   }
 
+  [[nodiscard]] Vect operator+(Vect v) const {
+    return Vect(x_ + v.x(), y_ + v.y(), z_ + v.z());
+  }
+
+  [[nodiscard]] Vect operator-(Vect v) const {
+    return Vect(x_ - v.x(), y_ - v.y(), z_ - v.z());
+  }
+
   // Convert from degrees to radians
   [[nodiscard]] Vect to_radians() const;
 
@@ -44,8 +52,20 @@ class Vect {
   // Calculate magnitude of vector
   [[nodiscard]] float mag() const;
 
+  // Calculate unit vector
+  [[nodiscard]] Vect normalise() const;
+
   // Calculate quaternion from euler
   [[nodiscard]] Quat to_quat() const;
+
+  // Calculate the dot product
+  [[nodiscard]] static float dot(Vect a, Vect b);
+
+  // Calculate the cross product
+  [[nodiscard]] static Vect cross(Vect a, Vect b);
+
+  // Calculate the quaternions from two vectors
+  [[nodiscard]] static Quat quat_from_two_vect(Vect a, Vect b);
 };
 
 class Quat {
@@ -94,6 +114,8 @@ class Quat {
   }
 
   [[nodiscard]] Quat conjugate() const;
+
+  [[nodiscard]] float mag() const;
 
   [[nodiscard]] Quat normalise() const;
 

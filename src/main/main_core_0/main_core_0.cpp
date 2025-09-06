@@ -1,5 +1,7 @@
 #include "main_core_0.h"
 
+#include "Madgwick.h"
+
 auto update_yaw(float curr_yaw, float yaw_rate, float dt) -> float {
   return curr_yaw + yaw_rate * dt;
 }
@@ -23,8 +25,8 @@ void core_0_task(void* args) {
   pca9685::pca9685 my_pca(&my_bus);
 
   // PID Controller defintions
-  pid::pid pid_x(0.65F, 0.45F, 0.00013F, 0.0F, 25.0F);
-  pid::pid pid_y(0.65F, 0.45F, 0.00013F, 0.0F, 25.0F);
+  pid::pid pid_x(0.65F, 0.75F, 0.00013F, 0.0F, 25.0F);
+  pid::pid pid_y(0.65F, 0.75F, 0.00013F, 0.0F, 25.0F);
   pid::pid pid_z(1.2F, 1.0F, 0.0001F, 0.0F, 25.0F);
 
   // ESC object definitions
@@ -37,7 +39,6 @@ void core_0_task(void* args) {
   fsa8s::receiver my_receiver(RC_RX);
 
   // Orientation definitions
-  ori::Quat ori_quat(1.0F, 0.0F, 0.0F, 0.0F);
   ori::Quat ori_setpoint_quat{};
 
   ori::Vect gyro{};
@@ -55,10 +56,32 @@ void core_0_task(void* args) {
   float yaw{};
   uint8_t throttle{};
 
+  float min_x{}, max_x{}, min_y{}, max_y{}, min_z = 60, max_z{};
+
   // Setup
   vTaskDelay(pdMS_TO_TICKS(3000));
 
   my_icm.calibrate_gyro(1000);
+
+  ori::Vect meas_mag;
+  ori::Vect meas_acc;
+
+  my_icm.update();
+  my_icm.update_mag();
+  meas_acc = ori::Vect(my_icm.acc_x(), my_icm.acc_y(), my_icm.acc_z());
+  meas_mag = ori::Vect(my_icm.mag_x(), my_icm.mag_y(), my_icm.mag_z());
+  meas_acc = meas_acc / meas_acc.mag();
+  meas_mag = meas_mag / meas_mag.mag();
+
+  ori::Quat ori_quat =
+      ori::Vect::quat_from_two_vect(meas_acc, ori::Vect(0.0F, 0.0F, 1.0F));
+  ori::Quat meas_mag_q =
+      ori::Quat(0.0F, meas_mag.x(), meas_mag.y(), meas_mag.z());
+  ori::Quat mag_exp = ori_quat.conjugate() * meas_mag_q * ori_quat;
+
+  meas_mag = ori::Vect(mag_exp.i(), mag_exp.j(), mag_exp.k());
+
+  ori::madgwick filter(0.05, meas_mag, ori::Vect(0.0F, 0.0F, 1.0F));
 
   // Main loop
   while (true) {
@@ -72,6 +95,7 @@ void core_0_task(void* args) {
 
     // Update necessary sensors
     my_icm.update();
+    my_icm.update_mag();
     my_receiver.update();
 
     // Compute control inputs and desired state
@@ -87,13 +111,35 @@ void core_0_task(void* args) {
 
     // Calculate current orientation
     gyro = ori::Vect(my_icm.gyro_x(), my_icm.gyro_y(), my_icm.gyro_z());
-    ori_quat = ori_quat.update(gyro, dt);
-    ori_quat = ori_quat.normalise();
+
+    // TESTING
+    ori::Vect meas_acc(my_icm.acc_x(), my_icm.acc_y(), my_icm.acc_z());
+    ori::Vect meas_mag(my_icm.mag_x(), my_icm.mag_y(), my_icm.mag_z());
+
+    float acc_mag = meas_acc.mag();
+    meas_acc = meas_acc / acc_mag;
+    float mag_mag = meas_mag.mag();
+    meas_mag = meas_mag / mag_mag;
+
+    if (acc_mag > 9.0F && acc_mag < 10.6F) {
+      ori_quat = filter.update(ori_quat, gyro, meas_mag, meas_acc, dt);
+    } else {
+      ori_quat = ori_quat.update(gyro, dt);
+    }
+    // END
 
     // Calculate error direction
-    ori_setpoint = ori::Vect(my_data.ch1, my_data.ch2, yaw);
-    ori_setpoint_quat = ori_setpoint.to_quat();
-    ori_error = ori_quat.calc_error_axis(ori_setpoint_quat);
+    ori::Quat q_roll =
+        ori::Quat(cos(my_data.ch1 / 2), sin(my_data.ch1 / 2), 0, 0);
+    ori::Quat q_pitch =
+        ori::Quat(cos(my_data.ch2 / 2), 0, sin(my_data.ch2 / 2), 0);
+    ori::Quat q_yaw = ori::Quat(cos(yaw / 2), 0, 0, sin(yaw / 2));
+    ori_setpoint_quat = q_yaw * q_pitch * q_roll;
+
+    ori_error = ori_quat.calc_error(ori::Quat(1.0F, 0.0F, 0.0F, 0.0F));
+
+    ori_euler = ori_quat.to_euler();
+    ori_euler = ori_euler.to_degrees();
 
     // Check if armed, if not armed: continue
     if (my_data.ch5 <= 1500) {
@@ -101,10 +147,10 @@ void core_0_task(void* args) {
       pid_y.reset();
       pid_z.reset();
 
-      my_data.esc0 = 0;
-      my_data.esc1 = 0;
-      my_data.esc2 = 0;
-      my_data.esc3 = 0;
+      ESP_ERROR_CHECK(esc0.set_throttle(0));
+      ESP_ERROR_CHECK(esc1.set_throttle(0));
+      ESP_ERROR_CHECK(esc2.set_throttle(0));
+      ESP_ERROR_CHECK(esc3.set_throttle(0));
 
       continue;
     }
@@ -126,9 +172,9 @@ void core_0_task(void* args) {
       pid_y.set_setpoint((my_data.ch2));
       pid_z.set_setpoint((my_data.ch4));
     } else {
-      pid_x.set_setpoint(ori_error.x() * 10);
-      pid_y.set_setpoint(ori_error.y() * 10);
-      pid_z.set_setpoint(ori_error.z() * 10);
+      pid_x.set_setpoint((ori_error.x() - my_data.ch1) * 5);
+      pid_y.set_setpoint((ori_error.y() - my_data.ch2) * 5);
+      pid_z.set_setpoint((ori_error.z() - yaw) * 5);
     }
 
     //  Calculate control outputs
@@ -164,9 +210,9 @@ void core_0_task(void* args) {
     my_data.ori_y = ori_euler.y();
     my_data.ori_z = ori_euler.z();
 
-    my_data.set_x = ori_setpoint.x();
-    my_data.set_y = ori_setpoint.y();
-    my_data.set_z = ori_setpoint.z();
+    my_data.set_x = ori_error.x() * 5;
+    my_data.set_y = ori_error.y() * 5;
+    my_data.set_z = ori_error.z() * 5;
 
     my_data.gyro_x = gyro.x();
     my_data.gyro_y = gyro.y();

@@ -12,7 +12,7 @@ icm20948::icm20948(i2c::i2c_bus* master_bus) : _master_bus(master_bus) {
   _set_i2c_bypass();
 
   _mag_config.dev_addr_length = I2C_ADDR_BIT_LEN_7;
-  _mag_config.scl_speed_hz = I2C_SPEED;
+  _mag_config.scl_speed_hz = I2C_SPEED_MAG;
   _mag_config.device_address = MAG_ADDR;
 
   ESP_ERROR_CHECK(_master_bus->add_slave_to_bus(&_mag_config, &_mag_handle));
@@ -118,13 +118,18 @@ void icm20948::update_mag() {
 
   _master_bus->read_bytes_i2c<uint8_t, 1>(_mag_handle, MAG_ST2);
 
-  _mag_x = static_cast<float>(static_cast<int16_t>((mag >> 32) & AXIS_MASK)) *
-           CONVERT_MAG;
-  _mag_y = static_cast<float>(static_cast<int16_t>((mag >> 16) & AXIS_MASK)) *
-           CONVERT_MAG;
-  _mag_z =
-      static_cast<float>(static_cast<int16_t>(mag & AXIS_MASK)) * CONVERT_MAG -
-      MAG_Z_OFFS;
+  _mag_x = (static_cast<float>(static_cast<int16_t>((mag >> 32) & AXIS_MASK)) *
+                CONVERT_MAG -
+            MAG_X_OFFS) *
+           MAG_X_SCALE;
+  _mag_y = -(static_cast<float>(static_cast<int16_t>((mag >> 16) & AXIS_MASK)) *
+                 CONVERT_MAG -
+             MAG_Y_OFFS) *
+           MAG_Y_SCALE;
+  _mag_z = -(static_cast<float>(static_cast<int16_t>(mag & AXIS_MASK)) *
+                 CONVERT_MAG -
+             MAG_Z_OFFS) *
+           MAG_Z_SCALE;
 }
 // NOLINTEND(misc-magic-numbers, readability-magic-numbers)
 
